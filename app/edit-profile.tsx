@@ -4,18 +4,19 @@ import {
   Text,
   TextInput,
   Pressable,
-  StyleSheet,
-  Image,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { Ionicons, FontAwesome } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../lib/supabase'
 import PageContainer from '../components/PageContainer'
 import { useRouter } from 'expo-router'
 import { useAvatar } from '../hooks/useAvatar'
+import AvatarWithCamera from '../components/AvatarWithCamera'
+import CommonStyles from '../app/styles/CommonStyles'
+import styles from '../app/styles/EditProfileStyles'
 
 const GENDER_OPTIONS = ['male', 'female', 'other'] as const
 type Gender = typeof GENDER_OPTIONS[number]
@@ -117,28 +118,14 @@ export default function EditProfileScreen() {
           </View>
 
           {/* Avatar + camera button */}
-          <View style={styles.avatarWrapper}>
-            <Pressable onPress={pickAndUploadAvatar}>
-              {photo ? (
-                <Image source={{ uri: photo }} style={styles.avatar} />
-              ) : (
-                <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                  <Text style={{ color: '#007AFF', fontSize: 32 }}>+</Text>
-                </View>
-              )}
-            </Pressable>
-
-            <Pressable style={styles.avatarEditBtn} onPress={pickAndUploadAvatar}>
-              <FontAwesome name="camera" size={16} color="#fff" />
-            </Pressable>
-          </View>
+          <AvatarWithCamera photo={photo} onPress={pickAndUploadAvatar} />
 
           {/* Card with fields */}
-          <View style={styles.card}>
+          <View style={CommonStyles.card}>
             <View style={styles.field}>
-              <Text style={styles.label}>First name</Text>
+              <Text style={CommonStyles.labelText}>First name</Text>
               <TextInput
-                style={styles.input}
+                style={CommonStyles.input}
                 placeholder="Enter first name"
                 value={firstName}
                 onChangeText={setFirstName}
@@ -147,9 +134,9 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Last name</Text>
+              <Text style={CommonStyles.labelText}>Last name</Text>
               <TextInput
-                style={styles.input}
+                style={CommonStyles.input}
                 placeholder="Enter last name"
                 value={lastName}
                 onChangeText={setLastName}
@@ -159,7 +146,7 @@ export default function EditProfileScreen() {
 
             {/* Gender selector */}
             <View style={styles.field}>
-              <Text style={styles.label}>Gender</Text>
+              <Text style={CommonStyles.labelText}>Gender</Text>
               <View style={styles.pillsRow}>
                 {GENDER_OPTIONS.map(opt => (
                   <Pressable
@@ -180,9 +167,9 @@ export default function EditProfileScreen() {
 
             {/* Date of Birth */}
             <View style={styles.field}>
-              <Text style={styles.label}>Date of Birth</Text>
+              <Text style={CommonStyles.labelText}>Date of Birth</Text>
               <Pressable
-                style={styles.input}
+                style={CommonStyles.input}
                 onPress={() => {
                   setShowDOBPicker(true)
                   setDobTemp(
@@ -204,9 +191,9 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Country</Text>
+              <Text style={CommonStyles.labelText}>Country</Text>
               <TextInput
-                style={styles.input}
+                style={CommonStyles.input}
                 placeholder="Enter country"
                 value={country}
                 onChangeText={setCountry}
@@ -215,12 +202,12 @@ export default function EditProfileScreen() {
           </View>
 
           {/* Actions */}
-          <View style={styles.actions}>
-            <Pressable style={[styles.button, styles.buttonPrimary]} onPress={saveProfile}>
-              <Text style={styles.buttonPrimaryText}>Save</Text>
+          <View style={CommonStyles.actions}>
+            <Pressable style={[CommonStyles.buttonBase, CommonStyles.buttonPrimary]} onPress={saveProfile}>
+              <Text style={CommonStyles.buttonPrimaryText}>Save</Text>
             </Pressable>
-            <Pressable style={[styles.button, styles.buttonSecondary]} onPress={() => router.back()}>
-              <Text style={styles.buttonSecondaryText}>Cancel</Text>
+            <Pressable style={[CommonStyles.buttonBase, CommonStyles.buttonSecondary]} onPress={() => router.back()}>
+              <Text style={CommonStyles.buttonSecondaryText}>Cancel</Text>
             </Pressable>
           </View>
 
@@ -230,153 +217,3 @@ export default function EditProfileScreen() {
     </PageContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  scroll: {
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    gap: 16,
-  },
-
-  // Header row with back arrow
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    padding: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#007AFF',
-    textAlign: 'center',
-  },
-
-  // Avatar
-  avatarWrapper: {
-    position: 'relative',
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarEditBtn: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#007AFF',
-    borderRadius: 18,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-
-  // Card and fields
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#E6EAF2',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
-  },
-  field: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    color: '#667085',
-    fontWeight: '500',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#D0D5DD',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#F8FAFC',
-  },
-
-  // Gender pills
-  pillsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  pill: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#D0D5DD',
-    backgroundColor: '#fff',
-  },
-  pillActive: {
-    borderColor: '#007AFF',
-    backgroundColor: '#E6F0FF',
-  },
-  pillText: {
-    fontSize: 14,
-    color: '#667085',
-    fontWeight: '500',
-    textTransform: 'capitalize',
-  },
-  pillTextActive: {
-    color: '#007AFF',
-  },
-
-  // Actions
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  button: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonPrimary: {
-    backgroundColor: '#007AFF',
-  },
-  buttonPrimaryText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  buttonSecondary: {
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    backgroundColor: '#fff',
-  },
-  buttonSecondaryText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-})

@@ -14,7 +14,7 @@ export function useAvatar(initialPhoto?: string) {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'], // как у тебя, без deprecated API
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
