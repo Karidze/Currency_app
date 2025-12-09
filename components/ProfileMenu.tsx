@@ -47,7 +47,11 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
       {/* More Options */}
       <View style={styles.section}>
         <Text style={CommonStyles.sectionTitle}>More Options</Text>
-        <MenuItem icon="info-circle" label="About us" />
+        <MenuItem
+          icon="info-circle"
+          label="About us"
+          onPress={() => router.push('/about-us')}
+        />
         <MenuItem icon="sign-out" label="Log out" onPress={onLogout} />
       </View>
 

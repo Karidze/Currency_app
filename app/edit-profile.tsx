@@ -17,6 +17,7 @@ import { useAvatar } from '../hooks/useAvatar'
 import AvatarWithCamera from '../components/AvatarWithCamera'
 import CommonStyles from '../app/styles/CommonStyles'
 import styles from '../app/styles/EditProfileStyles'
+import HeaderStyles from '../app/styles/HeaderStyles'
 
 const GENDER_OPTIONS = ['male', 'female', 'other'] as const
 type Gender = typeof GENDER_OPTIONS[number]
@@ -110,11 +111,11 @@ export default function EditProfileScreen() {
           keyboardDismissMode="on-drag"
         >
           {/* Заголовок с iOS стрелкой */}
-          <View style={styles.headerRow}>
-            <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <View style={HeaderStyles.headerRow}>
+            <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
               <Ionicons name="chevron-back" size={24} color="#007AFF" />
             </Pressable>
-            <Text style={styles.title}>Edit profile</Text>
+            <Text style={HeaderStyles.title}>Edit Profile</Text>
           </View>
 
           {/* Avatar + camera button */}
