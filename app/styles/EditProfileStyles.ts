@@ -8,25 +8,6 @@ const EditProfileStyles = StyleSheet.create({
     gap: 16,
   },
 
-  // Header row with back arrow
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    padding: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#007AFF',
-    textAlign: 'center',
-  },
-
   // Поля формы
   field: {
     gap: 6,

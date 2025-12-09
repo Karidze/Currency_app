@@ -1,35 +1,33 @@
-// styles/CommonStyles.ts
 import { StyleSheet } from 'react-native'
 
 const CommonStyles = StyleSheet.create({
-  // Общие отступы для ScrollView / контейнеров
   containerPadding: {
     paddingVertical: 24,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20, // чуть больше горизонтальный отступ
   },
 
-  // Заголовки секций / карточек
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18, // увеличили
+    fontWeight: "600",
     color: '#007AFF',
+    marginBottom: 8,
   },
 
-  // Текстовые стили
   labelText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#667085',
-    fontWeight: '500',
+    fontWeight: "500",
   },
   smallText: {
     fontSize: 14,
     color: '#666',
   },
   itemLabel: {
-    fontSize: 16,
+    fontSize: 18, // увеличили шрифт для пунктов меню
+    fontWeight: "500",
+    color: '#111',
   },
 
-  // Карточка
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -43,28 +41,27 @@ const CommonStyles = StyleSheet.create({
     elevation: 2,
   },
 
-  // Поля ввода (используется в EditProfileScreen)
   input: {
     borderWidth: 1,
     borderColor: '#D0D5DD',
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     fontSize: 16,
     backgroundColor: '#F8FAFC',
   },
 
-  // Кнопки и контейнер действий
   actions: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 16,
   },
   buttonBase: {
     flex: 1,
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -73,7 +70,7 @@ const CommonStyles = StyleSheet.create({
   },
   buttonPrimaryText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
   },
   buttonSecondary: {
@@ -83,23 +80,59 @@ const CommonStyles = StyleSheet.create({
   },
   buttonSecondaryText: {
     color: '#007AFF',
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
   },
 
-  // Элементы списка
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16, // увеличили отступ
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
   itemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 14, // чуть больше расстояние между иконкой и текстом
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    width: '85%',
     gap: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: '#007AFF',
+    marginBottom: 8,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+  },
+  closeBtn: {
+    marginTop: 12,
+    alignSelf: 'flex-end',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  closeText: {
+    color: '#fff',
+    fontWeight: "600",
   },
 })
 

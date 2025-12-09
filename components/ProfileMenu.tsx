@@ -1,10 +1,10 @@
-// components/ProfileMenu.tsx
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useAvatar } from '../hooks/useAvatar'
 import AvatarWithCamera from './AvatarWithCamera'
 import CommonStyles from '../app/styles/CommonStyles'
+import AboutUsModal from './AboutUsModal'
 
 export default function ProfileMenu({ profile, email, onLogout }: any) {
   const router = useRouter()
@@ -39,19 +39,20 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
 
       {/* Settings */}
       <View style={styles.section}>
-        <Text style={CommonStyles.sectionTitle}>Setting</Text>
-        <MenuItem icon="cog" label="Settings" />
+        <Text style={CommonStyles.sectionTitle}>Settings</Text>
+        <MenuItem
+          icon="cog"
+          label="Settings"
+          onPress={() => router.push('/settings')}
+        />
         <MenuItem icon="question-circle" label="Help" />
       </View>
 
       {/* More Options */}
       <View style={styles.section}>
         <Text style={CommonStyles.sectionTitle}>More Options</Text>
-        <MenuItem
-          icon="info-circle"
-          label="About us"
-          onPress={() => router.push('/about-us')}
-        />
+        {/* Вставляем AboutUsModal вместо перехода */}
+        <AboutUsModal />
         <MenuItem icon="sign-out" label="Log out" onPress={onLogout} />
       </View>
 
