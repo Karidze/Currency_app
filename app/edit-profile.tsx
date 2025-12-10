@@ -1,5 +1,3 @@
-// app/edit-profile.tsx
-
 import { useEffect, useState } from 'react'
 import {
   View,
@@ -17,9 +15,10 @@ import PageContainer from '../components/PageContainer'
 import { useRouter } from 'expo-router'
 import { useAvatar } from '../hooks/useAvatar'
 import AvatarWithCamera from '../components/AvatarWithCamera'
-import CommonStyles from '../app/styles/CommonStyles'
-import styles from '../app/styles/EditProfileStyles'
-import HeaderStyles from '../app/styles/HeaderStyles'
+import { getCommonStyles } from '../styles/CommonStyles'
+import styles from '../styles/EditProfileStyles'
+import HeaderStyles from '../styles/HeaderStyles'
+import { useTheme } from '../context/ThemeContext'
 
 const GENDER_OPTIONS = ['male', 'female', 'other'] as const
 type Gender = typeof GENDER_OPTIONS[number]
@@ -43,6 +42,8 @@ export default function EditProfileScreen() {
 
   const router = useRouter()
   const { photo, setPhoto, pickAndUploadAvatar } = useAvatar('')
+  const { isDark } = useTheme()
+  const CommonStyles = getCommonStyles(isDark)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -115,7 +116,7 @@ export default function EditProfileScreen() {
           {/* Заголовок с iOS стрелкой */}
           <View style={HeaderStyles.headerRow}>
             <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-              <Ionicons name="chevron-back" size={24} color="#007AFF" />
+              <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
             </Pressable>
             <Text style={HeaderStyles.title}>Edit Profile</Text>
           </View>
@@ -130,6 +131,7 @@ export default function EditProfileScreen() {
               <TextInput
                 style={CommonStyles.input}
                 placeholder="Enter first name"
+                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
@@ -141,6 +143,7 @@ export default function EditProfileScreen() {
               <TextInput
                 style={CommonStyles.input}
                 placeholder="Enter last name"
+                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={lastName}
                 onChangeText={setLastName}
                 autoCapitalize="words"
@@ -187,7 +190,7 @@ export default function EditProfileScreen() {
                   )
                 }}
               >
-                <Text style={{ color: dateOfBirth ? '#111' : '#999', fontSize: 16 }}>
+                <Text style={{ color: dateOfBirth ? (isDark ? '#fff' : '#111') : '#999', fontSize: 16 }}>
                   {dateOfBirth || 'Select date'}
                 </Text>
               </Pressable>
@@ -198,6 +201,7 @@ export default function EditProfileScreen() {
               <TextInput
                 style={CommonStyles.input}
                 placeholder="Enter country"
+                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={country}
                 onChangeText={setCountry}
               />

@@ -1,16 +1,22 @@
 // components/PageContainer.tsx
+import React, { ReactNode } from 'react'
 import { StyleSheet } from 'react-native'
-import { ReactNode } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useTheme } from '../context/ThemeContext'
 
 export default function PageContainer({ children }: { children: ReactNode }) {
-  return <SafeAreaView style={styles.container}>{children}</SafeAreaView>
+  const { theme } = useTheme()
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      {children}
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingTop: 20,
   },

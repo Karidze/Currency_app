@@ -3,12 +3,15 @@ import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useAvatar } from '../hooks/useAvatar'
 import AvatarWithCamera from './AvatarWithCamera'
-import CommonStyles from '../app/styles/CommonStyles'
+import { getCommonStyles } from '../styles/CommonStyles'
 import AboutUsModal from './AboutUsModal'
+import { useTheme } from '../context/ThemeContext'
 
 export default function ProfileMenu({ profile, email, onLogout }: any) {
   const router = useRouter()
   const { photo, setPhoto, pickAndUploadAvatar } = useAvatar(profile?.photo || '')
+  const { isDark } = useTheme()
+  const CommonStyles = getCommonStyles(isDark)
 
   return (
     <ScrollView
@@ -20,7 +23,7 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
       <View style={styles.header}>
         <AvatarWithCamera photo={photo} onPress={pickAndUploadAvatar} />
 
-        <Text style={styles.name}>
+        <Text style={[styles.name, { color: isDark ? '#fff' : '#111' }]}>
           {profile?.first_name} {profile?.last_name}
         </Text>
         <Text style={CommonStyles.smallText}>{email}</Text>
@@ -33,8 +36,10 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
           icon="id-card"
           label="Personal details"
           onPress={() => router.push('/edit-profile')}
+          isDark={isDark}
+          CommonStyles={CommonStyles}
         />
-        <MenuItem icon="file-text" label="Document and Statement" />
+        <MenuItem icon="file-text" label="Document and Statement" isDark={isDark} CommonStyles={CommonStyles} />
       </View>
 
       {/* Settings */}
@@ -44,8 +49,10 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
           icon="cog"
           label="Settings"
           onPress={() => router.push('/settings')}
+          isDark={isDark}
+          CommonStyles={CommonStyles}
         />
-        <MenuItem icon="question-circle" label="Help" />
+        <MenuItem icon="question-circle" label="Help" isDark={isDark} CommonStyles={CommonStyles} />
       </View>
 
       {/* More Options */}
@@ -53,7 +60,7 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
         <Text style={CommonStyles.sectionTitle}>More Options</Text>
         {/* Вставляем AboutUsModal вместо перехода */}
         <AboutUsModal />
-        <MenuItem icon="sign-out" label="Log out" onPress={onLogout} />
+        <MenuItem icon="sign-out" label="Log out" onPress={onLogout} isDark={isDark} CommonStyles={CommonStyles} />
       </View>
 
       <View style={{ height: 32 }} />
@@ -61,14 +68,14 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
   )
 }
 
-function MenuItem({ icon, label, onPress }: any) {
+function MenuItem({ icon, label, onPress, isDark, CommonStyles }: any) {
   return (
     <Pressable style={CommonStyles.itemRow} onPress={onPress}>
       <View style={CommonStyles.itemLeft}>
-        <FontAwesome name={icon} size={20} color="#007AFF" />
+        <FontAwesome name={icon} size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
         <Text style={CommonStyles.itemLabel}>{label}</Text>
       </View>
-      <FontAwesome name="angle-right" size={20} color="#ccc" />
+      <FontAwesome name="angle-right" size={20} color={isDark ? '#888' : '#ccc'} />
     </Pressable>
   )
 }

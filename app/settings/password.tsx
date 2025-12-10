@@ -13,9 +13,10 @@ import {
 import PageContainer from '../../components/PageContainer'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter, Stack } from 'expo-router'
-import CommonStyles from '../../app/styles/CommonStyles'
-import HeaderStyles from '../../app/styles/HeaderStyles'
+import { getCommonStyles } from '../../styles/CommonStyles'
+import HeaderStyles from '../../styles/HeaderStyles'
 import { supabase } from '../../lib/supabase'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function PasswordSettings() {
   const [currentPassword, setCurrentPassword] = useState('')
@@ -29,6 +30,8 @@ export default function PasswordSettings() {
   const [showConfirm, setShowConfirm] = useState(false)
 
   const router = useRouter()
+  const { isDark } = useTheme()
+  const CommonStyles = getCommonStyles(isDark)
 
   function getPasswordStrength(password: string) {
     let score = 0
@@ -98,14 +101,15 @@ export default function PasswordSettings() {
         <Text style={CommonStyles.labelText}>{label}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={styles.inputWithIcon}
+            style={[CommonStyles.input, styles.inputWithIcon]}
             placeholder={placeholder}
+            placeholderTextColor={isDark ? '#888' : '#999'}
             secureTextEntry={!show}
             value={value}
             onChangeText={setter}
           />
           <Pressable style={styles.eyeButton} onPress={toggleShow}>
-            <Ionicons name={show ? "eye-off-outline" : "eye-outline"} size={20} color="#007AFF" />
+            <Ionicons name={show ? "eye-off-outline" : "eye-outline"} size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
           </Pressable>
         </View>
       </View>
@@ -125,7 +129,7 @@ export default function PasswordSettings() {
           {/* Header */}
           <View style={HeaderStyles.headerRow}>
             <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-              <Ionicons name="chevron-back" size={24} color="#007AFF" />
+              <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
             </Pressable>
             <Text style={HeaderStyles.title}>Update Password</Text>
           </View>
@@ -192,7 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputWithIcon: {
-    ...CommonStyles.input,
     paddingRight: 40, // место для иконки
   },
   eyeButton: {

@@ -1,28 +1,31 @@
 import { useState } from 'react'
 import { View, Text, Pressable, Modal } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
-import CommonStyles from '../app/styles/CommonStyles'
+import { getCommonStyles } from '../styles/CommonStyles'
+import { useTheme } from '../context/ThemeContext'
 
 export default function AboutUsModal() {
   const [modalVisible, setModalVisible] = useState<'about' | 'policy' | null>(null)
+  const { isDark } = useTheme()
+  const CommonStyles = getCommonStyles(isDark)
 
   return (
     <>
       {/* Menu items */}
       <Pressable style={CommonStyles.itemRow} onPress={() => setModalVisible('about')}>
         <View style={CommonStyles.itemLeft}>
-          <FontAwesome name="info-circle" size={20} color="#007AFF" />
+          <FontAwesome name="info-circle" size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
           <Text style={CommonStyles.itemLabel}>About the App</Text>
         </View>
-        <FontAwesome name="angle-right" size={20} color="#ccc" />
+        <FontAwesome name="angle-right" size={20} color={isDark ? '#888' : '#ccc'} />
       </Pressable>
 
       <Pressable style={CommonStyles.itemRow} onPress={() => setModalVisible('policy')}>
         <View style={CommonStyles.itemLeft}>
-          <FontAwesome name="file-text" size={20} color="#007AFF" />
+          <FontAwesome name="file-text" size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
           <Text style={CommonStyles.itemLabel}>Terms & Privacy Policy</Text>
         </View>
-        <FontAwesome name="angle-right" size={20} color="#ccc" />
+        <FontAwesome name="angle-right" size={20} color={isDark ? '#888' : '#ccc'} />
       </Pressable>
 
       {/* Modal for "About the App" */}

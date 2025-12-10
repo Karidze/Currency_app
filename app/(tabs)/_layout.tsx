@@ -1,11 +1,16 @@
 // app/tabs/_layout.tsx
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { useNavigation } from 'expo-router';
+
+import { Tabs } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons'
+import { View, Text, StyleSheet } from 'react-native'
+import { useNavigation } from 'expo-router'
+import { useTheme } from '../../context/ThemeContext'
+import { lightTheme, darkTheme } from '../../styles/ThemesStyle'
 
 export default function TabLayout() {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
+  const { isDark } = useTheme()
+  const colors = isDark ? darkTheme : lightTheme
 
   return (
     <Tabs
@@ -14,37 +19,37 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           height: 70,
-          backgroundColor: '#fff',
+          backgroundColor: colors.card,
           borderTopWidth: 0,
           elevation: 10,
         },
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap;
+        tabBarIcon: ({ focused }) => {
+          let iconName: keyof typeof Ionicons.glyphMap
 
           switch (route.name) {
             case 'home':
-              iconName = focused ? 'home' : 'home-outline';
-              break;
+              iconName = focused ? 'home' : 'home-outline'
+              break
             case 'rates':
-              iconName = focused ? 'stats-chart' : 'stats-chart-outline';
-              break;
+              iconName = focused ? 'stats-chart' : 'stats-chart-outline'
+              break
             case 'exchange':
               return (
-                <View style={styles.exchangeButton}>
+                <View style={[styles.exchangeButton, { backgroundColor: colors.primary }]}>
                   <Text style={styles.exchangeText}>💱</Text>
                 </View>
-              );
+              )
             case 'history':
-              iconName = focused ? 'time' : 'time-outline';
-              break;
+              iconName = focused ? 'time' : 'time-outline'
+              break
             case 'profile':
-              iconName = focused ? 'person' : 'person-outline';
-              break;
+              iconName = focused ? 'person' : 'person-outline'
+              break
             default:
-              iconName = 'ellipse';
+              iconName = 'ellipse'
           }
 
-          return <Ionicons name={iconName} size={24} color={focused ? '#007AFF' : '#999'} />;
+          return <Ionicons name={iconName} size={24} color={focused ? colors.primary : colors.secondaryText} />
         },
       })}
     >
@@ -54,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen name="history" />
       <Tabs.Screen name="profile" />
     </Tabs>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -64,7 +69,6 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     borderRadius: 30,
-    backgroundColor: '#007AFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -76,4 +80,4 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#fff',
   },
-});
+})

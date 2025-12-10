@@ -1,8 +1,8 @@
 import { View, Text, Pressable, ScrollView } from 'react-native'
 import PageContainer from '../components/PageContainer'
 import { Ionicons } from '@expo/vector-icons'
-import CommonStyles from '../app/styles/CommonStyles'
-import HeaderStyles from '../app/styles/HeaderStyles'
+import CommonStyles from '../styles/CommonStyles'
+import HeaderStyles from '../styles/HeaderStyles'
 import { useRouter, Stack } from 'expo-router'
 import AboutUsModal from '../components/AboutUsModal'
 

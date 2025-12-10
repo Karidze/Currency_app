@@ -3,11 +3,12 @@ import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-
 import PageContainer from '../../components/PageContainer'
 import { Ionicons, FontAwesome } from '@expo/vector-icons'
 import { useRouter, Stack } from 'expo-router'
-import CommonStyles from '../../app/styles/CommonStyles'
-import HeaderStyles from '../../app/styles/HeaderStyles'
+import { getCommonStyles } from '../../styles/CommonStyles'
+import HeaderStyles from '../../styles/HeaderStyles'
 import AvatarWithCamera from '../../components/AvatarWithCamera'
 import { useAvatar } from '../../hooks/useAvatar'
 import { supabase } from '../../lib/supabase'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function ContactSettings() {
   const [profile, setProfile] = useState<any>(null)
@@ -21,6 +22,8 @@ export default function ContactSettings() {
 
   const router = useRouter()
   const { photo, setPhoto, pickAndUploadAvatar } = useAvatar('')
+  const { isDark } = useTheme()
+  const CommonStyles = getCommonStyles(isDark)
 
   // Загружаем профиль и email
   useEffect(() => {
@@ -82,6 +85,8 @@ export default function ContactSettings() {
             onChangeText={setter}
             onBlur={() => setEditingField(null)}
             autoFocus
+            placeholder={`Enter ${label}`}
+            placeholderTextColor={isDark ? '#888' : '#999'}
           />
         ) : (
           <View style={styles.valueRow}>
@@ -90,7 +95,7 @@ export default function ContactSettings() {
             </Text>
             {editable && (
               <Pressable onPress={() => setEditingField(fieldKey)}>
-                <FontAwesome name="pencil" size={18} color="#007AFF" />
+                <FontAwesome name="pencil" size={18} color={isDark ? '#0A84FF' : '#007AFF'} />
               </Pressable>
             )}
           </View>
@@ -107,7 +112,7 @@ export default function ContactSettings() {
         {/* Заголовок */}
         <View style={HeaderStyles.headerRow}>
           <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#007AFF" />
+            <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
           </Pressable>
           <Text style={HeaderStyles.title}>Contact Information</Text>
         </View>
