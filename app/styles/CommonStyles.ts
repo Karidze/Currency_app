@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native'
 
 const CommonStyles = StyleSheet.create({
   containerPadding: {
-    paddingVertical: 24,
-    paddingHorizontal: 20, // чуть больше горизонтальный отступ
+    paddingVertical: 5,
+    paddingHorizontal: 5, // чуть больше горизонтальный отступ
   },
 
   sectionTitle: {
@@ -23,7 +23,7 @@ const CommonStyles = StyleSheet.create({
     color: '#666',
   },
   itemLabel: {
-    fontSize: 18, // увеличили шрифт для пунктов меню
+    fontSize: 17, // увеличили шрифт для пунктов меню
     fontWeight: "500",
     color: '#111',
   },
@@ -46,7 +46,7 @@ const CommonStyles = StyleSheet.create({
     borderColor: '#D0D5DD',
     borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingVertical: 10,
     fontSize: 16,
     backgroundColor: '#F8FAFC',
   },
@@ -72,6 +72,7 @@ const CommonStyles = StyleSheet.create({
     color: '#fff',
     fontWeight: "600",
     fontSize: 16,
+    
   },
   buttonSecondary: {
     borderWidth: 1,
