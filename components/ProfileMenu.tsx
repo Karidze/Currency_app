@@ -52,15 +52,26 @@ export default function ProfileMenu({ profile, email, onLogout }: any) {
           isDark={isDark}
           CommonStyles={CommonStyles}
         />
-        <MenuItem icon="question-circle" label="Help" isDark={isDark} CommonStyles={CommonStyles} />
+        <MenuItem
+          icon="question-circle"
+          label="Help"
+          onPress={() => router.push('/help')} 
+          isDark={isDark}
+          CommonStyles={CommonStyles}
+        />
       </View>
 
       {/* More Options */}
       <View style={styles.section}>
         <Text style={CommonStyles.sectionTitle}>More Options</Text>
-        {/* Вставляем AboutUsModal вместо перехода */}
         <AboutUsModal />
-        <MenuItem icon="sign-out" label="Log out" onPress={onLogout} isDark={isDark} CommonStyles={CommonStyles} />
+        <MenuItem
+          icon="sign-out"
+          label="Log out"
+          onPress={onLogout}
+          isDark={isDark}
+          CommonStyles={CommonStyles}
+        />
       </View>
 
       <View style={{ height: 32 }} />

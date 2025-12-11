@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5, // лёгкая тень для «парящего» эффекта
+    elevation: 5, 
   },
   gradient: {
     flex: 1,
