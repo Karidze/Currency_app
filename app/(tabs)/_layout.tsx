@@ -1,16 +1,15 @@
 // app/tabs/_layout.tsx
 
-import { Tabs } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
-import { View, Text, StyleSheet } from 'react-native'
-import { useNavigation } from 'expo-router'
-import { useTheme } from '../../context/ThemeContext'
-import { lightTheme, darkTheme } from '../../styles/ThemesStyle'
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs, useNavigation } from "expo-router";
+import { Image, StyleSheet, View } from "react-native";
+import { useTheme } from "../../context/ThemeContext";
+import { darkTheme, lightTheme } from "../../styles/ThemesStyle";
 
 export default function TabLayout() {
-  const navigation = useNavigation()
-  const { isDark } = useTheme()
-  const colors = isDark ? darkTheme : lightTheme
+  const navigation = useNavigation();
+  const { isDark } = useTheme();
+  const colors = isDark ? darkTheme : lightTheme;
 
   return (
     <Tabs
@@ -24,32 +23,48 @@ export default function TabLayout() {
           elevation: 10,
         },
         tabBarIcon: ({ focused }) => {
-          let iconName: keyof typeof Ionicons.glyphMap
+          let iconName: keyof typeof Ionicons.glyphMap;
 
           switch (route.name) {
-            case 'home':
-              iconName = focused ? 'home' : 'home-outline'
-              break
-            case 'rates':
-              iconName = focused ? 'stats-chart' : 'stats-chart-outline'
-              break
-            case 'exchange':
+            case "home":
+              iconName = focused ? "home" : "home-outline";
+              break;
+            case "rates":
+              iconName = focused ? "stats-chart" : "stats-chart-outline";
+              break;
+            case "exchange":
               return (
-                <View style={[styles.exchangeButton, { backgroundColor: colors.primary }]}>
-                  <Text style={styles.exchangeText}>💱</Text>
+                <View
+                  style={[
+                    styles.exchangeButton,
+                    { backgroundColor: colors.primary },
+                  ]}
+                >
+                  <Image
+                    source={require("../../assets/exchange.png")}
+                    style={styles.exchangeIcon}
+                    resizeMode="contain"
+                  />
                 </View>
-              )
-            case 'history':
-              iconName = focused ? 'time' : 'time-outline'
-              break
-            case 'profile':
-              iconName = focused ? 'person' : 'person-outline'
-              break
+              );
+
+            case "history":
+              iconName = focused ? "time" : "time-outline";
+              break;
+            case "profile":
+              iconName = focused ? "person" : "person-outline";
+              break;
             default:
-              iconName = 'ellipse'
+              iconName = "ellipse";
           }
 
-          return <Ionicons name={iconName} size={24} color={focused ? colors.primary : colors.secondaryText} />
+          return (
+            <Ionicons
+              name={iconName}
+              size={24}
+              color={focused ? colors.primary : colors.secondaryText}
+            />
+          );
         },
       })}
     >
@@ -59,25 +74,27 @@ export default function TabLayout() {
       <Tabs.Screen name="history" />
       <Tabs.Screen name="profile" />
     </Tabs>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   exchangeButton: {
-    position: 'absolute',
-    bottom: 10,
-    height: 60,
-    width: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -18,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
-  exchangeText: {
-    fontSize: 28,
-    color: '#fff',
+
+  exchangeIcon: {
+    width: 26,
+    height: 26,
+    tintColor: "#fff",
   },
-})
+});

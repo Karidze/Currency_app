@@ -1,8 +1,8 @@
+import { FontAwesome5, Ionicons } from '@expo/vector-icons'
+import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { View, Text, ScrollView, Pressable, TextInput, Image, StyleSheet } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import PageContainer from '../components/PageContainer'
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons'
-import { useRouter, Stack } from 'expo-router'
 import { useTheme } from '../context/ThemeContext'
 import { getCommonStyles } from '../styles/CommonStyles'
 import HeaderStyles from '../styles/HeaderStyles'
@@ -76,7 +76,7 @@ export default function HelpScreen() {
           {/* Logo */}
           <View style={styles.logoContainer}>
             <Image
-              source={require('../assets/logo-removebg-preview.png')}
+              source={require('../assets/icon.png')}
               style={styles.logo}
               resizeMode="contain"
             />

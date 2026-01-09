@@ -4,7 +4,7 @@ export const lightTheme = {
   text: '#111',
   card: '#fff',
   border: '#E6EAF2',
-  primary: '#007AFF',
+  primary: '#1D0DA1',
   secondaryText: '#667085',
   inputBg: '#F8FAFC',
 }
@@ -14,7 +14,7 @@ export const darkTheme = {
   text: '#fff',
   card: '#1c1c1e',
   border: '#333',
-  primary: '#0A84FF',
+  primary: '#1D0DA1',
   secondaryText: '#aaa',
   inputBg: '#2c2c2e',
 }
