@@ -1,39 +1,46 @@
-// app/help/getting-started.tsx
-import { View, Text, ScrollView, Pressable } from 'react-native'
-import PageContainer from '../../components/PageContainer'
-import { Ionicons } from '@expo/vector-icons'
-import { useRouter, Stack } from 'expo-router'
-import { useTheme } from '../../context/ThemeContext'
-import { getCommonStyles } from '../../styles/CommonStyles'
-import HeaderStyles from '../../styles/HeaderStyles'
+import React from "react";
+import { Pressable, View } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { Card, Icon, Screen, Text } from "../../components/ui";
 
 export default function GettingStartedScreen() {
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
 
   return (
-    <PageContainer>
+    <Screen>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
-        <View style={HeaderStyles.headerRow}>
-          <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
-          </Pressable>
-          <Text style={HeaderStyles.title}>Getting Started</Text>
-        </View>
 
-        <View style={CommonStyles.card}>
-          <Text style={CommonStyles.sectionTitle}>Welcome to Currency Exchange App</Text>
-          <Text style={CommonStyles.smallText}>
-            • Register with your email and create a secure password.{"\n"}
-            • Complete your profile with personal details.{"\n"}
-            • Verification is required before you can exchange or trade currencies.{"\n"}
-            • Once verified, you’ll gain access to exchange, withdrawal, and trading features.{"\n"}
-            • Explore the dashboard to monitor rates and manage your wallet.
-          </Text>
-        </View>
-      </ScrollView>
-    </PageContainer>
-  )
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 14,
+        }}
+      >
+        <Pressable
+          onPress={() => router.back()}
+          style={{ width: 36, height: 36, justifyContent: "center" }}
+        >
+          <Icon name="chevron-left" color="primary" />
+        </Pressable>
+        <Text variant="subtitle" weight="700">
+          Getting Started
+        </Text>
+        <View style={{ width: 36 }} />
+      </View>
+
+      <Card padding="lg" style={{ gap: 10 }}>
+        <Text weight="700">Welcome to Currency Exchange App</Text>
+        <Text color="muted">
+          • Register with your email and create a secure password.{"\n"}•
+          Complete your profile with personal details.{"\n"}• Verification is
+          required before you can exchange or trade currencies.{"\n"}• Once
+          verified, you’ll gain access to exchange, withdrawal, and trading
+          features.{"\n"}• Explore the dashboard to monitor rates and manage
+          your wallet.
+        </Text>
+      </Card>
+    </Screen>
+  );
 }

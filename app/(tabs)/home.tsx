@@ -1,11 +1,12 @@
-// app/tabs/home.tsx
-import { Text } from 'react-native'
-import PageContainer from '../../components/PageContainer'
+import { Screen, Text } from "../../components/ui";
 
 export default function HomeScreen() {
   return (
-    <PageContainer>
-      <Text style={{ fontSize: 20 }}>🏠 Home</Text>
-    </PageContainer>
-  )
+    <Screen>
+      <Text variant="title" weight="700">
+        Home
+      </Text>
+      <Text color="muted">Your dashboard will be here.</Text>
+    </Screen>
+  );
 }

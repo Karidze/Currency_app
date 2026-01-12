@@ -1,102 +1,130 @@
-// components/ProfileMenu.tsx
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
-import { FontAwesome } from '@expo/vector-icons'
-import { useRouter } from 'expo-router'
-import { useAvatar } from '../hooks/useAvatar'
-import AvatarWithCamera from './AvatarWithCamera'
-import { getCommonStyles } from '../styles/CommonStyles'
-import AboutUsModal from './AboutUsModal'
-import { useTheme } from '../context/ThemeContext'
+import { useRouter } from "expo-router";
+import React from "react";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useAvatar } from "../hooks/useAvatar";
+import { useTheme } from "../hooks/useTheme";
+import AboutUsModal from "./AboutUsModal";
+import AvatarWithCamera from "./AvatarWithCamera";
+import { Card, Icon, Text } from "./ui";
 
 export default function ProfileMenu({ profile, email, onLogout }: any) {
-  const router = useRouter()
-  const { photo, setPhoto, pickAndUploadAvatar } = useAvatar(profile?.photo || '')
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
+  const { photo, setPhoto, pickAndUploadAvatar } = useAvatar(
+    profile?.photo || ""
+  );
+  const { theme } = useTheme();
 
   return (
     <ScrollView
-      contentContainerStyle={[CommonStyles.containerPadding, styles.container]}
+      contentContainerStyle={[styles.container, { padding: theme.spacing.lg }]}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
     >
-      {/* Заголовок с аватаром */}
-      <View style={styles.header}>
+      <Card padding="lg" style={styles.headerCard}>
         <AvatarWithCamera photo={photo} onPress={pickAndUploadAvatar} />
-
-        <Text style={[styles.name, { color: isDark ? '#fff' : '#111' }]}>
+        <Text variant="subtitle" weight="700" center>
           {profile?.first_name} {profile?.last_name}
         </Text>
-        <Text style={CommonStyles.smallText}>{email}</Text>
-      </View>
+        <Text color="muted" center>
+          {email}
+        </Text>
+      </Card>
 
-      {/* Personal Information */}
-      <View style={styles.section}>
-        <Text style={CommonStyles.sectionTitle}>Personal Information</Text>
+      <Card padding="lg" style={styles.section}>
+        <Text weight="700">Personal Information</Text>
         <MenuItem
           icon="id-card"
           label="Personal details"
-          onPress={() => router.push('/edit-profile')}
-          isDark={isDark}
-          CommonStyles={CommonStyles}
+          onPress={() => router.push("/edit-profile")}
         />
-        <MenuItem icon="file-text" label="Document and Statement" isDark={isDark} CommonStyles={CommonStyles} />
-      </View>
+        <MenuItem icon="file-text" label="Document and Statement" />
+      </Card>
 
-      {/* Settings */}
-      <View style={styles.section}>
-        <Text style={CommonStyles.sectionTitle}>Settings</Text>
+      <Card padding="lg" style={styles.section}>
+        <Text weight="700">Settings</Text>
         <MenuItem
           icon="cog"
           label="Settings"
-          onPress={() => router.push('/settings')}
-          isDark={isDark}
-          CommonStyles={CommonStyles}
+          onPress={() => router.push("/settings")}
         />
         <MenuItem
           icon="question-circle"
           label="Help"
-          onPress={() => router.push('/help')} 
-          isDark={isDark}
-          CommonStyles={CommonStyles}
+          onPress={() => router.push("/help")}
         />
-      </View>
+      </Card>
 
-      {/* More Options */}
-      <View style={styles.section}>
-        <Text style={CommonStyles.sectionTitle}>More Options</Text>
+      <Card padding="lg" style={styles.section}>
+        <Text weight="700">More Options</Text>
         <AboutUsModal />
-        <MenuItem
-          icon="sign-out"
-          label="Log out"
-          onPress={onLogout}
-          isDark={isDark}
-          CommonStyles={CommonStyles}
-        />
-      </View>
+        <MenuItem icon="sign-out" label="Log out" onPress={onLogout} danger />
+      </Card>
 
-      <View style={{ height: 32 }} />
+      <View style={{ height: 24 }} />
     </ScrollView>
-  )
+  );
 }
 
-function MenuItem({ icon, label, onPress, isDark, CommonStyles }: any) {
+function MenuItem({
+  icon,
+  label,
+  onPress,
+  danger,
+}: {
+  icon: React.ComponentProps<typeof Icon>["name"];
+  label: string;
+  onPress?: () => void;
+  danger?: boolean;
+}) {
+  const { theme } = useTheme();
+
   return (
-    <Pressable style={CommonStyles.itemRow} onPress={onPress}>
-      <View style={CommonStyles.itemLeft}>
-        <FontAwesome name={icon} size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
-        <Text style={CommonStyles.itemLabel}>{label}</Text>
+    <Pressable
+      onPress={onPress}
+      style={[styles.itemRow, { borderBottomColor: theme.colors.border }]}
+    >
+      <View style={styles.itemLeft}>
+        <Icon
+          name={icon}
+          size={20}
+          color={danger ? "muted" : "primary"}
+          // @ts-ignore
+        />
+        <Text
+          weight="600"
+          style={{ color: danger ? theme.colors.danger : theme.colors.text }}
+        >
+          {label}
+        </Text>
       </View>
-      <FontAwesome name="angle-right" size={20} color={isDark ? '#888' : '#ccc'} />
+
+      <Icon name="angle-right" size={20} color="muted" />
     </Pressable>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: 24,
+    gap: 14,
+    paddingBottom: 30,
   },
-  header: { alignItems: 'center', gap: 4 },
-  name: { fontSize: 20, fontWeight: '600' },
-  section: { gap: 8 },
-})
+  headerCard: {
+    gap: 8,
+    alignItems: "center",
+  },
+  section: {
+    gap: 10,
+  },
+  itemRow: {
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  itemLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+});

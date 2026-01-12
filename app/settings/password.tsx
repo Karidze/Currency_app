@@ -1,91 +1,90 @@
-// app/settings/password.tsx
-import { useState } from 'react'
+import { useState } from "react";
 import {
   View,
-  Text,
-  TextInput,
   ScrollView,
   Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-} from 'react-native'
-import PageContainer from '../../components/PageContainer'
-import { Ionicons } from '@expo/vector-icons'
-import { useRouter, Stack } from 'expo-router'
-import { getCommonStyles } from '../../styles/CommonStyles'
-import HeaderStyles from '../../styles/HeaderStyles'
-import { supabase } from '../../lib/supabase'
-import { useTheme } from '../../context/ThemeContext'
+} from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { supabase } from "../../lib/supabase";
+
+// ✅ new UI
+import { Button, Card, Icon, Input, Screen, Text } from "../../components/ui";
+import { useTheme } from "../../hooks/useTheme";
 
 export default function PasswordSettings() {
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 👁 отдельные стейты для каждого поля
-  const [showCurrent, setShowCurrent] = useState(false)
-  const [showNew, setShowNew] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
+  const { theme } = useTheme();
 
   function getPasswordStrength(password: string) {
-    let score = 0
-    if (password.length >= 6) score++
-    if (/[A-Z]/.test(password)) score++
-    if (/[0-9]/.test(password)) score++
-    if (/[^A-Za-z0-9]/.test(password)) score++
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 1) return { label: 'Weak', color: 'red', progress: 0.33 }
-    if (score === 2) return { label: 'Medium', color: 'orange', progress: 0.66 }
-    return { label: 'Strong', color: 'green', progress: 1 }
+    if (score <= 1) return { label: "Weak", color: "red", progress: 0.33 };
+    if (score === 2)
+      return { label: "Medium", color: "orange", progress: 0.66 };
+    return { label: "Strong", color: "green", progress: 1 };
   }
 
   async function save() {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      alert('Please fill in all fields')
-      return
+      alert("Please fill in all fields");
+      return;
     }
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match')
-      return
+      alert("New passwords do not match");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
       if (userError || !user) {
-        alert('Unable to fetch user: ' + userError?.message)
-        return
+        alert("Unable to fetch user: " + userError?.message);
+        return;
       }
 
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user.email!,
         password: currentPassword,
-      })
+      });
       if (signInError) {
-        alert('Current password is incorrect')
-        return
+        alert("Current password is incorrect");
+        return;
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
-      })
+      });
       if (updateError) {
-        alert('Password update failed: ' + updateError.message)
-        return
+        alert("Password update failed: " + updateError.message);
+        return;
       }
 
-      alert('Password updated successfully!')
-      router.back()
+      alert("Password updated successfully!");
+      router.back();
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -98,121 +97,170 @@ export default function PasswordSettings() {
     toggleShow: () => void
   ) {
     return (
-      <View style={{ marginBottom: 16 }}>
-        <Text style={CommonStyles.labelText}>{label}</Text>
+      <View style={{ gap: 8 }}>
+        <Text weight="600">{label}</Text>
+
         <View style={styles.inputWrapper}>
-          <TextInput
-            style={[CommonStyles.input, styles.inputWithIcon]}
-            placeholder={placeholder}
-            placeholderTextColor={isDark ? '#888' : '#999'}
-            secureTextEntry={!show}
+          <Input
             value={value}
             onChangeText={setter}
+            placeholder={placeholder}
+            secureTextEntry={!show}
+            style={styles.inputWithIcon}
           />
+
           <Pressable style={styles.eyeButton} onPress={toggleShow}>
-            <Ionicons name={show ? "eye-off-outline" : "eye-outline"} size={20} color={isDark ? '#0A84FF' : '#007AFF'} />
+            <Icon name={show ? "eye-slash" : "eye"} size={18} color="primary" />
           </Pressable>
         </View>
       </View>
-    )
+    );
   }
 
-  const strength = getPasswordStrength(newPassword)
+  const strength = getPasswordStrength(newPassword);
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: theme.spacing.lg,
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.xl,
+            gap: theme.spacing.lg,
+          }}
+        >
           {/* Header */}
-          <View style={HeaderStyles.headerRow}>
-            <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-              <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
+          <View style={styles.headerRow}>
+            <Pressable
+              onPress={() => router.back()}
+              style={{ width: 36, height: 36, justifyContent: "center" }}
+            >
+              <Icon name="chevron-left" color="primary" />
             </Pressable>
-            <Text style={HeaderStyles.title}>Update Password</Text>
+
+            <Text variant="subtitle" weight="700">
+              Update Password
+            </Text>
+
+            <View style={{ width: 36 }} />
           </View>
 
           {/* Card */}
-          <View style={CommonStyles.card}>
-            <Text style={CommonStyles.sectionTitle}>Change your password</Text>
+          <Card padding="lg" style={{ gap: theme.spacing.lg }}>
+            <Text weight="700">Change your password</Text>
 
-            {renderPasswordField('Current Password', currentPassword, setCurrentPassword, 'Enter current password', showCurrent, () => setShowCurrent(!showCurrent))}
-            {renderPasswordField('New Password', newPassword, setNewPassword, 'Enter new password', showNew, () => setShowNew(!showNew))}
+            {renderPasswordField(
+              "Current Password",
+              currentPassword,
+              setCurrentPassword,
+              "Enter current password",
+              showCurrent,
+              () => setShowCurrent(!showCurrent)
+            )}
 
-            {/* Progress bar силы пароля */}
-            {newPassword.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <View style={styles.progressBarBackground}>
+            {renderPasswordField(
+              "New Password",
+              newPassword,
+              setNewPassword,
+              "Enter new password",
+              showNew,
+              () => setShowNew(!showNew)
+            )}
+
+            {newPassword.length > 0 ? (
+              <View style={{ gap: 6 }}>
+                <View
+                  style={[
+                    styles.progressBg,
+                    { backgroundColor: theme.colors.border },
+                  ]}
+                >
                   <View
                     style={[
-                      styles.progressBarFill,
-                      { width: `${strength.progress * 100}%`, backgroundColor: strength.color },
+                      styles.progressFill,
+                      {
+                        width: `${strength.progress * 100}%`,
+                        backgroundColor: strength.color,
+                      },
                     ]}
                   />
                 </View>
-                <Text style={{ color: strength.color, marginTop: 4 }}>{strength.label}</Text>
+                <Text style={{ color: strength.color }}>{strength.label}</Text>
               </View>
-            )}
+            ) : null}
 
-            {renderPasswordField('Confirm New Password', confirmPassword, setConfirmPassword, 'Re-enter new password', showConfirm, () => setShowConfirm(!showConfirm))}
-          </View>
+            {renderPasswordField(
+              "Confirm New Password",
+              confirmPassword,
+              setConfirmPassword,
+              "Re-enter new password",
+              showConfirm,
+              () => setShowConfirm(!showConfirm)
+            )}
+          </Card>
 
           {/* Actions */}
-          <View style={CommonStyles.actions}>
+          <View style={{ gap: theme.spacing.sm }}>
             <Pressable
-              style={[
-                CommonStyles.buttonBase,
-                CommonStyles.buttonPrimary,
-                loading && { opacity: 0.6 },
-              ]}
+              disabled={loading}
               onPress={save}
-              disabled={loading}
+              style={{ width: "100%" }}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={CommonStyles.buttonPrimaryText}>Save</Text>
-              )}
+              <Button title="Save" fullWidth loading={loading} onPress={save} />
             </Pressable>
-            <Pressable
-              style={[CommonStyles.buttonBase, CommonStyles.buttonSecondary]}
+
+            <Button
+              title="Cancel"
+              variant="outline"
+              fullWidth
+              disabled={loading}
               onPress={() => router.back()}
-              disabled={loading}
-            >
-              <Text style={CommonStyles.buttonSecondaryText}>Cancel</Text>
-            </Pressable>
+            />
           </View>
+
+          {loading ? (
+            <View style={{ alignItems: "center" }}>
+              <ActivityIndicator />
+            </View>
+          ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
-    </PageContainer>
-  )
+    </Screen>
+  );
 }
 
 const styles = StyleSheet.create({
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   inputWrapper: {
-    position: 'relative',
-    justifyContent: 'center',
+    position: "relative",
+    justifyContent: "center",
   },
   inputWithIcon: {
-    paddingRight: 40, // место для иконки
+    paddingRight: 44,
   },
   eyeButton: {
-    position: 'absolute',
+    position: "absolute",
     right: 12,
-    height: '100%',
-    justifyContent: 'center',
+    height: "100%",
+    justifyContent: "center",
   },
-  progressBarBackground: {
+  progressBg: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#E6EAF2',
-    overflow: 'hidden',
+    overflow: "hidden",
   },
-  progressBarFill: {
+  progressFill: {
     height: 8,
     borderRadius: 4,
   },
-})
+});

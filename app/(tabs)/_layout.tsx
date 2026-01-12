@@ -1,15 +1,10 @@
-// app/tabs/_layout.tsx
-
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useNavigation } from "expo-router";
+import { Tabs } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
-import { useTheme } from "../../context/ThemeContext";
-import { darkTheme, lightTheme } from "../../styles/ThemesStyle";
+import { useTheme } from "../../hooks/useTheme";
 
 export default function TabLayout() {
-  const navigation = useNavigation();
-  const { isDark } = useTheme();
-  const colors = isDark ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <Tabs
@@ -18,7 +13,7 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           height: 70,
-          backgroundColor: colors.card,
+          backgroundColor: theme.colors.card,
           borderTopWidth: 0,
           elevation: 10,
         },
@@ -37,7 +32,7 @@ export default function TabLayout() {
                 <View
                   style={[
                     styles.exchangeButton,
-                    { backgroundColor: colors.primary },
+                    { backgroundColor: theme.colors.primary },
                   ]}
                 >
                   <Image
@@ -47,7 +42,6 @@ export default function TabLayout() {
                   />
                 </View>
               );
-
             case "history":
               iconName = focused ? "time" : "time-outline";
               break;
@@ -62,7 +56,7 @@ export default function TabLayout() {
             <Ionicons
               name={iconName}
               size={24}
-              color={focused ? colors.primary : colors.secondaryText}
+              color={focused ? theme.colors.primary : theme.colors.mutedText}
             />
           );
         },
@@ -85,13 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: -18,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
   },
-
   exchangeIcon: {
     width: 26,
     height: 26,

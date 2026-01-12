@@ -1,90 +1,83 @@
-// app/edit-profile.tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   View,
-  Text,
-  TextInput,
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import { Ionicons } from '@expo/vector-icons'
-import { supabase } from '../lib/supabase'
-import PageContainer from '../components/PageContainer'
-import { useRouter } from 'expo-router'
-import { useAvatar } from '../hooks/useAvatar'
-import AvatarWithCamera from '../components/AvatarWithCamera'
-import { getCommonStyles } from '../styles/CommonStyles'
-import styles from '../styles/EditProfileStyles'
-import HeaderStyles from '../styles/HeaderStyles'
-import { useTheme } from '../context/ThemeContext'
+  StyleSheet,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useRouter, Stack } from "expo-router";
+import { supabase } from "../lib/supabase";
 
-const GENDER_OPTIONS = ['male', 'female', 'other'] as const
-type Gender = typeof GENDER_OPTIONS[number]
+import { useAvatar } from "../hooks/useAvatar";
+import AvatarWithCamera from "../components/AvatarWithCamera";
 
-function formatDate(date: Date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
+// ✅ new UI
+import { Button, Card, Icon, Input, Screen, Text } from "../components/ui";
+import { useTheme } from "../hooks/useTheme";
+
+const GENDER_OPTIONS = ["male", "female", "other"] as const;
+type Gender = (typeof GENDER_OPTIONS)[number];
 
 export default function EditProfileScreen() {
-  const [profile, setProfile] = useState<any>(null)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [gender, setGender] = useState<Gender>('other')
-  const [dateOfBirth, setDateOfBirth] = useState('')
-  const [country, setCountry] = useState('')
-  const [showDOBPicker, setShowDOBPicker] = useState(false)
-  const [dobTemp, setDobTemp] = useState<Date | undefined>(undefined)
+  const [profile, setProfile] = useState<any>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [gender, setGender] = useState<Gender>("other");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [country, setCountry] = useState("");
+  const [showDOBPicker, setShowDOBPicker] = useState(false);
+  const [dobTemp, setDobTemp] = useState<Date | undefined>(undefined);
 
-  const router = useRouter()
-  const { photo, setPhoto, pickAndUploadAvatar } = useAvatar('')
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
+  const { photo, setPhoto, pickAndUploadAvatar } = useAvatar("");
+  const { theme, isDark } = useTheme();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      const userId = data?.user?.id
+      const userId = data?.user?.id;
       if (userId) {
         supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', userId)
+          .from("profiles")
+          .select("*")
+          .eq("user_id", userId)
           .single()
           .then(({ data }) => {
             if (data) {
-              setProfile(data)
-              setFirstName(data.first_name || '')
-              setLastName(data.last_name || '')
-              const g = (data.gender || '').toLowerCase()
-              setGender(GENDER_OPTIONS.includes(g as Gender) ? (g as Gender) : 'other')
-              setDateOfBirth(data.date_of_birth || '')
-              setCountry(data.country || '')
-              setPhoto(data.photo || '')
+              setProfile(data);
+              setFirstName(data.first_name || "");
+              setLastName(data.last_name || "");
+              const g = (data.gender || "").toLowerCase();
+              setGender(
+                GENDER_OPTIONS.includes(g as Gender) ? (g as Gender) : "other"
+              );
+              setDateOfBirth(data.date_of_birth || "");
+              setCountry(data.country || "");
+              setPhoto(data.photo || "");
               if (data.date_of_birth) {
-                const parts = String(data.date_of_birth).split('-').map(Number)
+                const parts = String(data.date_of_birth).split("-").map(Number);
                 if (parts.length === 3 && !Number.isNaN(parts[0])) {
-                  setDobTemp(new Date(parts[0], parts[1] - 1, parts[2]))
+                  setDobTemp(new Date(parts[0], parts[1] - 1, parts[2]));
                 }
               }
             }
-          })
+          });
       }
-    })
-  }, [setPhoto])
+    });
+  }, [setPhoto]);
 
   async function saveProfile() {
-    if (!profile) return
+    if (!profile) return;
 
-    const genderValue: Gender = GENDER_OPTIONS.includes(gender) ? gender : 'other'
-    const dobValue = dateOfBirth ? dateOfBirth : null
+    const genderValue: Gender = GENDER_OPTIONS.includes(gender)
+      ? gender
+      : "other";
+    const dobValue = dateOfBirth ? dateOfBirth : null;
 
     const { error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
         first_name: firstName,
         last_name: lastName,
@@ -93,92 +86,129 @@ export default function EditProfileScreen() {
         country,
         photo,
       })
-      .eq('user_id', profile.user_id)
+      .eq("user_id", profile.user_id);
 
     if (error) {
-      alert('Update failed: ' + error.message)
+      alert("Update failed: " + error.message);
     } else {
-      alert('Profile updated successfully!')
-      router.back()
+      alert("Profile updated successfully!");
+      router.back();
     }
   }
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
+      <Stack.Screen options={{ headerShown: false }} />
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={{
+            paddingHorizontal: theme.spacing.lg,
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.xl,
+            gap: theme.spacing.lg,
+          }}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
-          {/* Заголовок с iOS стрелкой */}
-          <View style={HeaderStyles.headerRow}>
-            <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-              <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
+          {/* Header */}
+          <View style={styles.headerRow}>
+            <Pressable
+              onPress={() => router.back()}
+              style={{ width: 36, height: 36, justifyContent: "center" }}
+            >
+              <Icon name="chevron-left" color="primary" />
             </Pressable>
-            <Text style={HeaderStyles.title}>Edit Profile</Text>
+            <Text variant="subtitle" weight="700">
+              Edit Profile
+            </Text>
+            <View style={{ width: 36 }} />
           </View>
 
-          {/* Avatar + camera button */}
-          <AvatarWithCamera photo={photo} onPress={pickAndUploadAvatar} />
+          {/* Avatar */}
+          <View style={{ alignItems: "center" }}>
+            <AvatarWithCamera photo={photo} onPress={pickAndUploadAvatar} />
+          </View>
 
-          {/* Card with fields */}
-          <View style={CommonStyles.card}>
-            <View style={styles.field}>
-              <Text style={CommonStyles.labelText}>First name</Text>
-              <TextInput
-                style={CommonStyles.input}
+          {/* Fields */}
+          <Card padding="lg" style={{ gap: theme.spacing.lg }}>
+            <View style={{ gap: 8 }}>
+              <Text weight="600">First name</Text>
+              <Input
                 placeholder="Enter first name"
-                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
               />
             </View>
 
-            <View style={styles.field}>
-              <Text style={CommonStyles.labelText}>Last name</Text>
-              <TextInput
-                style={CommonStyles.input}
+            <View style={{ gap: 8 }}>
+              <Text weight="600">Last name</Text>
+              <Input
                 placeholder="Enter last name"
-                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={lastName}
                 onChangeText={setLastName}
                 autoCapitalize="words"
               />
             </View>
 
-            {/* Gender selector */}
-            <View style={styles.field}>
-              <Text style={CommonStyles.labelText}>Gender</Text>
+            {/* Gender pills */}
+            <View style={{ gap: 10 }}>
+              <Text weight="600">Gender</Text>
               <View style={styles.pillsRow}>
-                {GENDER_OPTIONS.map(opt => (
-                  <Pressable
-                    key={opt}
-                    onPress={() => setGender(opt)}
-                    style={[
-                      styles.pill,
-                      gender === opt && styles.pillActive,
-                    ]}
-                  >
-                    <Text style={[styles.pillText, gender === opt && styles.pillTextActive]}>
-                      {opt}
-                    </Text>
-                  </Pressable>
-                ))}
+                {GENDER_OPTIONS.map((opt) => {
+                  const active = gender === opt;
+                  return (
+                    <Pressable
+                      key={opt}
+                      onPress={() => setGender(opt)}
+                      style={[
+                        styles.pill,
+                        {
+                          borderColor: active
+                            ? theme.colors.primary
+                            : theme.colors.border,
+                          backgroundColor: active
+                            ? theme.colors.primary
+                            : "transparent",
+                        },
+                      ]}
+                    >
+                      <Text
+                        weight="600"
+                        color={active ? "text" : "muted"}
+                        style={{
+                          color: active
+                            ? theme.colors.primaryText
+                            : theme.colors.text,
+                        }}
+                      >
+                        {opt}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
 
             {/* Date of Birth */}
-            <View style={styles.field}>
-              <Text style={CommonStyles.labelText}>Date of Birth</Text>
+            <View style={{ gap: 8 }}>
+              <Text weight="600">Date of Birth</Text>
+
               <Pressable
-                style={CommonStyles.input}
+                style={[
+                  styles.dateBox,
+                  {
+                    backgroundColor: theme.colors.inputBg,
+                    borderColor: theme.colors.inputBorder,
+                    borderRadius: theme.radius.md,
+                  },
+                ]}
                 onPress={() => {
-                  setShowDOBPicker(true)
+                  setShowDOBPicker(true);
                   setDobTemp(
                     dobTemp ??
                       (dateOfBirth
@@ -188,40 +218,90 @@ export default function EditProfileScreen() {
                             Number(dateOfBirth.slice(8, 10))
                           )
                         : new Date(1990, 0, 1))
-                  )
+                  );
                 }}
               >
-                <Text style={{ color: dateOfBirth ? (isDark ? '#fff' : '#111') : '#999', fontSize: 16 }}>
-                  {dateOfBirth || 'Select date'}
+                <Text color={dateOfBirth ? "text" : "muted"}>
+                  {dateOfBirth || "Select date"}
                 </Text>
               </Pressable>
+
+              {showDOBPicker && dobTemp ? (
+                <DateTimePicker
+                  value={dobTemp}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  onChange={(_, date) => {
+                    if (Platform.OS !== "ios") setShowDOBPicker(false);
+                    if (date) {
+                      const y = date.getFullYear();
+                      const m = String(date.getMonth() + 1).padStart(2, "0");
+                      const d = String(date.getDate()).padStart(2, "0");
+                      setDateOfBirth(`${y}-${m}-${d}`);
+                      setDobTemp(date);
+                    }
+                  }}
+                />
+              ) : null}
+
+              {Platform.OS === "ios" && showDOBPicker ? (
+                <View style={{ gap: theme.spacing.sm }}>
+                  <Button
+                    title="Done"
+                    onPress={() => setShowDOBPicker(false)}
+                    fullWidth
+                  />
+                </View>
+              ) : null}
             </View>
 
-            <View style={styles.field}>
-              <Text style={CommonStyles.labelText}>Country</Text>
-              <TextInput
-                style={CommonStyles.input}
+            <View style={{ gap: 8 }}>
+              <Text weight="600">Country</Text>
+              <Input
                 placeholder="Enter country"
-                placeholderTextColor={isDark ? '#888' : '#999'}
                 value={country}
                 onChangeText={setCountry}
               />
             </View>
-          </View>
+          </Card>
 
           {/* Actions */}
-          <View style={CommonStyles.actions}>
-            <Pressable style={[CommonStyles.buttonBase, CommonStyles.buttonPrimary]} onPress={saveProfile}>
-              <Text style={CommonStyles.buttonPrimaryText}>Save</Text>
-            </Pressable>
-            <Pressable style={[CommonStyles.buttonBase, CommonStyles.buttonSecondary]} onPress={() => router.back()}>
-              <Text style={CommonStyles.buttonSecondaryText}>Cancel</Text>
-            </Pressable>
+          <View style={{ gap: theme.spacing.sm }}>
+            <Button title="Save" onPress={saveProfile} fullWidth />
+            <Button
+              title="Cancel"
+              variant="outline"
+              onPress={() => router.back()}
+              fullWidth
+            />
           </View>
-
-          <View style={{ height: 32 }} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </PageContainer>
-  )
+    </Screen>
+  );
 }
+
+const styles = StyleSheet.create({
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  pillsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  pill: {
+    height: 40,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  dateBox: {
+    height: 48,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    justifyContent: "center",
+  },
+});

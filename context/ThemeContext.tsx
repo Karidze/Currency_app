@@ -1,33 +1,44 @@
 // context/ThemeContext.tsx
-import React, { createContext, useContext, useState } from 'react'
-import { lightTheme, darkTheme } from '../styles/ThemesStyle'
+import React, { createContext, useContext, useMemo, useState } from "react";
+import type { Theme, ThemeMode } from "../constants/theme";
+import { darkTheme, lightTheme } from "../constants/theme";
 
-type ThemeContextType = {
-  theme: typeof lightTheme
-  isDark: boolean
-  toggleTheme: () => void
-}
+type ThemeContextValue = {
+  mode: ThemeMode;
+  isDark: boolean;
+  theme: Theme;
+  setMode: (mode: ThemeMode) => void;
+  toggle: () => void;
+};
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: lightTheme,
-  isDark: false,
-  toggleTheme: () => {},
-})
+// ВАЖЛИВО: export (щоб useTheme міг імпортувати)
+export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isDark, setIsDark] = useState(false)
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [mode, setMode] = useState<ThemeMode>("light");
 
-  function toggleTheme() {
-    setIsDark(prev => !prev)
-  }
+  const value = useMemo<ThemeContextValue>(() => {
+    const isDark = mode === "dark";
+    const theme = isDark ? darkTheme : lightTheme;
 
-  const theme = isDark ? darkTheme : lightTheme
+    return {
+      mode,
+      isDark,
+      theme,
+      setMode,
+      toggle: () => setMode((m) => (m === "dark" ? "light" : "dark")),
+    };
+  }, [mode]);
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
-export const useTheme = () => useContext(ThemeContext)
+// optional (можеш не юзати, якщо є useTheme.ts)
+export function useThemeContext() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx)
+    throw new Error("useThemeContext must be used inside ThemeProvider");
+  return ctx;
+}

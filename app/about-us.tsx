@@ -1,34 +1,54 @@
-// app/about-us.tsx
-import { View, Text, Pressable, ScrollView } from 'react-native'
-import PageContainer from '../components/PageContainer'
-import { Ionicons } from '@expo/vector-icons'
-import { getCommonStyles } from '../styles/CommonStyles'   // ✅ правильный импорт
-import HeaderStyles from '../styles/HeaderStyles'
-import { useRouter, Stack } from 'expo-router'
-import AboutUsModal from '../components/AboutUsModal'
-import { useTheme } from '../context/ThemeContext'         // ✅ подключаем тему
+import { View, Pressable, ScrollView } from "react-native";
+import { Stack, useRouter } from "expo-router";
+
+import AboutUsModal from "../components/AboutUsModal";
+
+// ✅ new UI
+import { Card, Icon, Screen, Text } from "../components/ui";
+import { useTheme } from "../hooks/useTheme";
 
 export default function AboutUsScreen() {
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)             // ✅ получаем стили по теме
+  const router = useRouter();
+  const { theme } = useTheme();
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
-        {/* Header row with back arrow */}
-        <View style={HeaderStyles.headerRow}>
-          <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: theme.spacing.lg,
+          paddingTop: theme.spacing.lg,
+          paddingBottom: theme.spacing.xl,
+          gap: theme.spacing.lg,
+        }}
+      >
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Pressable
+            onPress={() => router.back()}
+            style={{ width: 36, height: 36, justifyContent: "center" }}
+          >
+            <Icon name="chevron-left" color="primary" />
           </Pressable>
-          <Text style={HeaderStyles.title}>About Us</Text>
+
+          <Text variant="subtitle" weight="700">
+            About Us
+          </Text>
+
+          <View style={{ width: 36 }} />
         </View>
 
-        {/* Вставляем переиспользуемый компонент */}
-        <AboutUsModal />
+        <Card padding="lg">
+          <AboutUsModal />
+        </Card>
       </ScrollView>
-    </PageContainer>
-  )
+    </Screen>
+  );
 }

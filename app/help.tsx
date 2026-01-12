@@ -1,204 +1,174 @@
-// app/help.tsx
-import { FontAwesome5, Ionicons } from '@expo/vector-icons'
-import { Stack, useRouter } from 'expo-router'
-import { useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import PageContainer from '../components/PageContainer'
-import { useTheme } from '../context/ThemeContext'
-import { getCommonStyles } from '../styles/CommonStyles'
-import HeaderStyles from '../styles/HeaderStyles'
+import React, { useMemo, useState } from "react";
+import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { Screen, Text, Card, Input, Icon, Button } from "../components/ui";
+import { useTheme } from "../hooks/useTheme";
 
 export default function HelpScreen() {
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
-  const themeColor = isDark ? '#0A84FF' : '#007AFF'
-
-  const [search, setSearch] = useState('')
+  const router = useRouter();
+  const { theme } = useTheme();
+  const [search, setSearch] = useState("");
 
   const sections = [
     {
-      icon: 'rocket',
-      label: 'Getting Started',
-      path: '/help/getting-started',
+      icon: "rocket",
+      label: "Getting Started",
+      path: "/help/getting-started",
       content:
-        'Learn how to register, set up your profile, and why verification is required before trading.',
+        "Learn how to register, set up your profile, and why verification is required before trading.",
     },
     {
-      icon: 'exchange-alt',
-      label: 'Currency Exchange',
-      path: '/help/exchange',
+      icon: "exchange",
+      label: "Currency Exchange",
+      path: "/help/exchange",
       content:
-        'Step-by-step guide to exchanging currencies, checking rates, and confirming transactions.',
+        "Step-by-step guide to exchanging currencies, checking rates, and confirming transactions.",
     },
     {
-      icon: 'money-check-alt',
-      label: 'Withdraw Funds',
-      path: '/help/withdraw',
+      icon: "money",
+      label: "Withdraw Funds",
+      path: "/help/withdraw",
       content:
-        'Instructions on withdrawing funds, linking bank accounts or cards, and processing times.',
+        "Instructions on withdrawing funds, linking bank accounts or cards, and processing times.",
     },
     {
-      icon: 'envelope',
-      label: 'Contact Us',
-      path: '/help/contact',
+      icon: "envelope",
+      label: "Contact Us",
+      path: "/help/contact",
       content:
-        'Ways to reach support: in-app chat, email, and FAQs for common issues.',
+        "Ways to reach support: in-app chat, email, and FAQs for common issues.",
     },
     {
-      icon: 'user-shield',
-      label: 'Privacy',
-      path: '/help/privacy',
+      icon: "shield",
+      label: "Privacy",
+      path: "/help/privacy",
       content:
-        'Details on how we protect your data, encryption, and our privacy policy.',
+        "Details on how we protect your data, encryption, and our privacy policy.",
     },
-  ]
+  ];
 
-  // фильтрация по поиску: ищем и по label, и по content
-  const filteredSections = sections.filter(
-    s =>
-      s.label.toLowerCase().includes(search.toLowerCase()) ||
-      s.content.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return sections;
+    return sections.filter(
+      (s) =>
+        s.label.toLowerCase().includes(q) || s.content.toLowerCase().includes(q)
+    );
+  }, [search]);
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={[CommonStyles.containerPadding, { paddingBottom: 100 }]}>
-          {/* Header with back arrow */}
-          <View style={HeaderStyles.headerRow}>
-            <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-              <Ionicons name="chevron-back" size={24} color={themeColor} />
-            </Pressable>
-            <Text style={HeaderStyles.title}>Help Center</Text>
-          </View>
 
-          {/* Logo */}
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../assets/icon.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-
-          <Text style={[CommonStyles.smallText, { textAlign: 'center', marginBottom: 16 }]}>
-            How can we help you?
+      <ScrollView
+        contentContainerStyle={{
+          padding: theme.spacing.lg,
+          paddingBottom: 120,
+        }}
+      >
+        <View style={styles.headerRow}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <Icon name="chevron-left" color="primary" />
+          </Pressable>
+          <Text variant="subtitle" weight="700">
+            Help Center
           </Text>
+          <View style={{ width: 36 }} />
+        </View>
 
-          {/* Search */}
-          <View
-            style={[
-              styles.searchBox,
-              {
-                backgroundColor: isDark ? '#1c1c1e' : '#F8FAFC',
-                borderColor: isDark ? '#333' : '#E6EAF2',
-              },
-            ]}
-          >
-            <Ionicons name="search" size={20} color={themeColor} />
-            <TextInput
-              placeholder="Search in Help Center"
-              placeholderTextColor={isDark ? '#888' : '#999'}
-              style={[styles.searchInput, { color: isDark ? '#fff' : '#111' }]}
-              value={search}
-              onChangeText={setSearch}
-            />
-          </View>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../assets/icon.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
-          {/* Sections */}
-          <Text style={[CommonStyles.labelText, { marginBottom: 12 }]}>Help Topics</Text>
-          {filteredSections.map((item, index) => (
+        <Text color="muted" center style={{ marginBottom: 14 }}>
+          How can we help you?
+        </Text>
+
+        <Input
+          placeholder="Search in Help Center"
+          value={search}
+          onChangeText={setSearch}
+        />
+
+        <View style={{ height: 16 }} />
+
+        <Text weight="700" style={{ marginBottom: 10 }}>
+          Help Topics
+        </Text>
+
+        <View style={{ gap: 10 }}>
+          {filtered.map((item, index) => (
             <Pressable
               key={index}
-              style={[CommonStyles.card, styles.sectionCard]}
               onPress={() => router.push(item.path as any)}
             >
-              <View style={styles.sectionRow}>
-                <FontAwesome5 name={item.icon as any} size={20} color={themeColor} />
-                <View style={{ marginLeft: 12 }}>
-                  <Text style={CommonStyles.itemLabel}>{item.label}</Text>
-                  <Text style={[CommonStyles.smallText, { marginTop: 4 }]} numberOfLines={1}>
-                    {item.content}
-                  </Text>
+              <Card padding="md" style={styles.topicCard}>
+                <View style={styles.topicLeft}>
+                  <Icon name={item.icon as any} color="primary" />
+                  <View style={{ flex: 1 }}>
+                    <Text weight="700">{item.label}</Text>
+                    <Text
+                      color="muted"
+                      numberOfLines={1}
+                      style={{ marginTop: 4 }}
+                    >
+                      {item.content}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={themeColor} />
+                <Icon name="chevron-right" color="muted" />
+              </Card>
             </Pressable>
           ))}
-        </ScrollView>
+        </View>
+      </ScrollView>
 
-        {/* Floating Contact Button */}
-        <Pressable
-          style={[styles.contactButton, { backgroundColor: themeColor }]}
-          onPress={() => router.push('/help/contact')}
-        >
-          <Text style={styles.contactText}>Contact Us</Text>
-        </Pressable>
+      <View style={[styles.floating, { padding: theme.spacing.lg }]}>
+        <Button
+          title="Contact Us"
+          fullWidth
+          onPress={() => router.push("/help/contact")}
+        />
       </View>
-    </PageContainer>
-  )
+    </Screen>
+  );
 }
 
 const styles = StyleSheet.create({
-  logoContainer: {
-    alignItems: 'center',
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 12,
   },
-  logo: {
-    width: 80,
-    height: 80,
+  backBtn: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 4,
+  logoContainer: { alignItems: "center", marginBottom: 10 },
+  logo: { width: 80, height: 80 },
+  topicCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
   },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 16,
-  },
-  sectionCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
-  sectionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  topicLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
     flex: 1,
   },
-  contactButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+  floating: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  contactText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-})
+});

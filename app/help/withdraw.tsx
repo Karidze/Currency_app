@@ -1,39 +1,56 @@
-// app/help/withdraw.tsx
-import { View, Text, ScrollView, Pressable } from 'react-native'
-import PageContainer from '../../components/PageContainer'
-import { Ionicons } from '@expo/vector-icons'
-import { useRouter, Stack } from 'expo-router'
-import { useTheme } from '../../context/ThemeContext'
-import { getCommonStyles } from '../../styles/CommonStyles'
-import HeaderStyles from '../../styles/HeaderStyles'
+import React from "react";
+import { Pressable, ScrollView, View } from "react-native";
+import { Stack, useRouter } from "expo-router";
+
+import { Card, Icon, Screen, Text } from "../../components/ui";
 
 export default function WithdrawScreen() {
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
-        <View style={HeaderStyles.headerRow}>
-          <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
+
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 18,
+          paddingTop: 18,
+          paddingBottom: 30,
+        }}
+      >
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 14,
+          }}
+        >
+          <Pressable
+            onPress={() => router.back()}
+            style={{ width: 36, height: 36, justifyContent: "center" }}
+          >
+            <Icon name="chevron-left" size={22} color="primary" />
           </Pressable>
-          <Text style={HeaderStyles.title}>Withdraw Funds</Text>
+
+          <Text variant="subtitle" weight="700">
+            Withdraw Funds
+          </Text>
+
+          <View style={{ width: 36 }} />
         </View>
 
-        <View style={CommonStyles.card}>
-          <Text style={CommonStyles.sectionTitle}>Steps to Withdraw</Text>
-          <Text style={CommonStyles.smallText}>
-            • Go to the Wallet section.{"\n"}
-            • Choose “Withdraw” and select your preferred method (bank account or card).{"\n"}
-            • Enter the amount and confirm.{"\n"}
-            • Processing times vary depending on your bank.{"\n"}
-            • Verification ensures secure withdrawals and prevents fraud.
+        <Card padding="lg" style={{ gap: 10 }}>
+          <Text weight="700">Steps to Withdraw</Text>
+          <Text color="muted">
+            • Go to the Wallet section.{"\n"}• Choose “Withdraw” and select your
+            preferred method (bank account or card).{"\n"}• Enter the amount and
+            confirm.{"\n"}• Processing times vary depending on your bank.{"\n"}•
+            Verification ensures secure withdrawals and prevents fraud.
           </Text>
-        </View>
+        </Card>
       </ScrollView>
-    </PageContainer>
-  )
+    </Screen>
+  );
 }

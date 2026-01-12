@@ -1,56 +1,100 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-/** 
- constants/theme.ts
-*/
+// constants/theme.ts
+export type ThemeMode = "light" | "dark";
 
-import { Platform } from 'react-native';
+export type Theme = {
+  colors: {
+    background: string;
+    text: string;
+    mutedText: string;
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+    card: string;
+    border: string;
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+    primary: string;
+    primaryText: string;
+
+    inputBg: string;
+    inputBorder: string;
+    placeholder: string;
+
+    danger: string;
+    success: string;
+  };
+
+  spacing: {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+  };
+
+  radius: {
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    pill: number;
+  };
+
+  typography: {
+    title: number;
+    subtitle: number;
+    body: number;
+    caption: number;
+  };
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+export const lightTheme: Theme = {
+  colors: {
+    background: "#FFFFFF",
+    text: "#111111",
+    mutedText: "#6B7280",
+
+    card: "#FFFFFF",
+    border: "#E5E7EB",
+
+    primary: "#1D0DA1",
+    primaryText: "#FFFFFF",
+
+    inputBg: "#F9FAFB",
+    inputBorder: "#D1D5DB",
+    placeholder: "#9CA3AF",
+
+    danger: "#DC2626",
+    success: "#16A34A",
   },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+
+  spacing: { xs: 6, sm: 10, md: 14, lg: 18, xl: 24 },
+
+  radius: { sm: 10, md: 12, lg: 16, xl: 22, pill: 999 },
+
+  typography: { title: 28, subtitle: 18, body: 16, caption: 13 },
+};
+
+export const darkTheme: Theme = {
+  colors: {
+    background: "#0B0B0F",
+    text: "#FFFFFF",
+    mutedText: "#A1A1AA",
+
+    card: "#111118",
+    border: "#2A2A33",
+
+    primary: "#1D0DA1",
+    primaryText: "#FFFFFF",
+
+    inputBg: "#12121A",
+    inputBorder: "#2A2A33",
+    placeholder: "#71717A",
+
+    danger: "#F87171",
+    success: "#4ADE80",
   },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+
+  spacing: { xs: 6, sm: 10, md: 14, lg: 18, xl: 24 },
+
+  radius: { sm: 10, md: 12, lg: 16, xl: 22, pill: 999 },
+
+  typography: { title: 28, subtitle: 18, body: 16, caption: 13 },
+};

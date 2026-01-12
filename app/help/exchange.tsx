@@ -1,48 +1,57 @@
-// app/help/exchange.tsx
-import { View, Text, ScrollView, Pressable } from "react-native";
-import PageContainer from "../../components/PageContainer";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter, Stack } from "expo-router";
-import { useTheme } from "../../context/ThemeContext";
-import { getCommonStyles } from "../../styles/CommonStyles";
-import HeaderStyles from "../../styles/HeaderStyles";
+import React from "react";
+import { Pressable, ScrollView, View } from "react-native";
+import { Stack, useRouter } from "expo-router";
+
+import { Card, Icon, Screen, Text } from "../../components/ui";
 
 export default function ExchangeScreen() {
   const router = useRouter();
-  const { isDark } = useTheme();
-  const CommonStyles = getCommonStyles(isDark);
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
-        <View style={HeaderStyles.headerRow}>
+
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 18,
+          paddingTop: 18,
+          paddingBottom: 30,
+        }}
+      >
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 14,
+          }}
+        >
           <Pressable
             onPress={() => router.back()}
-            style={HeaderStyles.backButton}
+            style={{ width: 36, height: 36, justifyContent: "center" }}
           >
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color={isDark ? "#0A84FF" : "#007AFF"}
-            />
+            <Icon name="chevron-left" size={22} color="primary" />
           </Pressable>
-          <Text style={HeaderStyles.title}>Currency Exchange</Text>
+
+          <Text variant="subtitle" weight="700">
+            Currency Exchange
+          </Text>
+
+          <View style={{ width: 36 }} />
         </View>
 
-        <View style={CommonStyles.card}>
-          <Text style={CommonStyles.sectionTitle}>
-            How to Exchange Currency
-          </Text>
-          <Text style={CommonStyles.smallText}>
+        <Card padding="lg" style={{ gap: 10 }}>
+          <Text weight="700">How to Exchange Currency</Text>
+          <Text color="muted">
             • Navigate to the Exchange tab.{"\n"}• Select the currency you want
             to sell and the currency you want to buy.{"\n"}• Enter the amount
             and check the live exchange rate.{"\n"}• Confirm the transaction —
             your wallet will update instantly.{"\n"}• Verified users can access
             higher limits and faster processing.
           </Text>
-        </View>
+        </Card>
       </ScrollView>
-    </PageContainer>
+    </Screen>
   );
 }

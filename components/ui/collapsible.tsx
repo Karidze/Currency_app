@@ -1,46 +1,52 @@
-// components/ui/collapsible.tsx
-import { PropsWithChildren, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+// components/ui/Collapsible.tsx
+import React, { PropsWithChildren, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../hooks/useTheme";
+import Icon from "./Icon";
+import Text from "./Text";
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+type Props = PropsWithChildren & { title: string };
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const theme = useColorScheme() ?? 'light';
+export default function Collapsible({ children, title }: Props) {
+  const [open, setOpen] = useState(false);
+  const { theme } = useTheme();
 
   return (
-    <ThemedView>
+    <View>
       <TouchableOpacity
+        onPress={() => setOpen((v) => !v)}
+        activeOpacity={0.8}
         style={styles.heading}
-        onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}>
-        <IconSymbol
-          name="chevron.right"
-          size={18}
-          weight="medium"
-          color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+      >
+        <Icon
+          name="chevron-right"
+          color="muted"
+          style={{ transform: [{ rotate: open ? "90deg" : "0deg" }] }}
         />
-
-        <ThemedText type="defaultSemiBold">{title}</ThemedText>
+        <Text weight="600">{title}</Text>
       </TouchableOpacity>
-      {isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
-    </ThemedView>
+
+      {open ? (
+        <View
+          style={[styles.content, { borderLeftColor: theme.colors.border }]}
+        >
+          {children}
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   heading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   content: {
-    marginTop: 6,
-    marginLeft: 24,
+    marginTop: 10,
+    marginLeft: 10,
+    paddingLeft: 12,
+    borderLeftWidth: 2,
   },
 });

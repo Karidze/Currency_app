@@ -1,61 +1,120 @@
-// app/settings/index.tsx
-import { View, Text, ScrollView, Pressable } from 'react-native'
-import PageContainer from '../../components/PageContainer'
-import { FontAwesome, Ionicons } from '@expo/vector-icons'
-import { useRouter, Stack } from 'expo-router'
-import { getCommonStyles } from '../../styles/CommonStyles'
-import HeaderStyles from '../../styles/HeaderStyles'
-import AboutUsModal from '../../components/AboutUsModal'
-import { useTheme } from '../../context/ThemeContext'
+import React from "react";
+import { Pressable, View, StyleSheet } from "react-native";
+import { Stack, useRouter } from "expo-router";
+
+import { Card, Icon, Screen, Text } from "../../components/ui";
+import AboutUsModal from "../../components/AboutUsModal";
+import { useTheme } from "../../hooks/useTheme";
 
 export default function SettingsMenu() {
-  const router = useRouter()
-  const { isDark } = useTheme()
-  const CommonStyles = getCommonStyles(isDark)
+  const router = useRouter();
+  const { theme } = useTheme();
 
   return (
-    <PageContainer>
+    <Screen padded={false}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView contentContainerStyle={CommonStyles.containerPadding}>
-        {/* Header with back arrow */}
-        <View style={HeaderStyles.headerRow}>
-          <Pressable onPress={() => router.back()} style={HeaderStyles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={isDark ? '#0A84FF' : '#007AFF'} />
+      <View
+        style={[
+          styles.container,
+          {
+            paddingHorizontal: theme.spacing.lg,
+            paddingTop: theme.spacing.lg,
+          },
+        ]}
+      >
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Pressable
+            onPress={() => router.back()}
+            style={{ width: 36, height: 36, justifyContent: "center" }}
+          >
+            <Icon name="chevron-left" color="primary" />
           </Pressable>
-          <Text style={HeaderStyles.title}>Settings</Text>
+          <Text variant="subtitle" weight="700">
+            Settings
+          </Text>
+          <View style={{ width: 36 }} />
         </View>
 
-        {/* Theme */}
-        <Pressable style={CommonStyles.itemRow} onPress={() => router.push('/settings/theme')}>
-          <View style={CommonStyles.itemLeft}>
-            <FontAwesome name="adjust" size={22} color={isDark ? '#0A84FF' : '#007AFF'} />
-            <Text style={CommonStyles.itemLabel}>Theme</Text>
-          </View>
-          <FontAwesome name="angle-right" size={22} color={isDark ? '#888' : '#ccc'} />
-        </Pressable>
+        <Card padding="lg" style={{ paddingVertical: 8 }}>
+          <Row
+            icon="adjust"
+            label="Theme"
+            onPress={() => router.push("/settings/theme")}
+            border
+          />
+          <Row
+            icon="address-card"
+            label="Contact Information"
+            onPress={() => router.push("/settings/contact")}
+            border
+          />
+          <Row
+            icon="lock"
+            label="Password"
+            onPress={() => router.push("/settings/password")}
+          />
+        </Card>
 
-        {/* Contact Info */}
-        <Pressable style={CommonStyles.itemRow} onPress={() => router.push('/settings/contact')}>
-          <View style={CommonStyles.itemLeft}>
-            <FontAwesome name="address-card" size={22} color={isDark ? '#0A84FF' : '#007AFF'} />
-            <Text style={CommonStyles.itemLabel}>Contact Information</Text>
-          </View>
-          <FontAwesome name="angle-right" size={22} color={isDark ? '#888' : '#ccc'} />
-        </Pressable>
+        <View style={{ height: 12 }} />
 
-        {/* Password */}
-        <Pressable style={CommonStyles.itemRow} onPress={() => router.push('/settings/password')}>
-          <View style={CommonStyles.itemLeft}>
-            <FontAwesome name="lock" size={22} color={isDark ? '#0A84FF' : '#007AFF'} />
-            <Text style={CommonStyles.itemLabel}>Password</Text>
-          </View>
-          <FontAwesome name="angle-right" size={22} color={isDark ? '#888' : '#ccc'} />
-        </Pressable>
-
-        {/* About the App → поп‑ап */}
-        <AboutUsModal />
-      </ScrollView>
-    </PageContainer>
-  )
+        <Card padding="lg" style={{ paddingVertical: 8 }}>
+          <AboutUsModal />
+        </Card>
+      </View>
+    </Screen>
+  );
 }
+
+function Row({
+  icon,
+  label,
+  onPress,
+  border,
+}: {
+  icon: any;
+  label: string;
+  onPress: () => void;
+  border?: boolean;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.row,
+        border
+          ? {
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderBottomColor: theme.colors.border,
+            }
+          : null,
+      ]}
+    >
+      <View style={styles.rowLeft}>
+        <Icon name={icon} color="primary" />
+        <Text weight="600">{label}</Text>
+      </View>
+      <Icon name="chevron-right" color="muted" />
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, gap: 14 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+  row: {
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  rowLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+});

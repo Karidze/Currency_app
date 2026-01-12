@@ -1,11 +1,12 @@
-// app/tabs/history.tsx
-import { Text } from 'react-native'
-import PageContainer from '../../components/PageContainer'
+import { Screen, Text } from "../../components/ui";
 
 export default function HistoryScreen() {
   return (
-    <PageContainer>
-      <Text style={{ fontSize: 20 }}>📜 History</Text>
-    </PageContainer>
-  )
+    <Screen>
+      <Text variant="title" weight="700">
+        History
+      </Text>
+      <Text color="muted">Transactions history will be here.</Text>
+    </Screen>
+  );
 }
