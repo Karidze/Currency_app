@@ -1,3 +1,4 @@
+// app/settings/index.tsx
 import { View, Text, ScrollView, Pressable } from 'react-native'
 import PageContainer from '../../components/PageContainer'
 import { FontAwesome, Ionicons } from '@expo/vector-icons'

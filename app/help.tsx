@@ -1,3 +1,4 @@
+// app/help.tsx
 import { FontAwesome5, Ionicons } from '@expo/vector-icons'
 import { Stack, useRouter } from 'expo-router'
 import { useState } from 'react'

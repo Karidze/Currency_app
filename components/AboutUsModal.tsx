@@ -1,3 +1,4 @@
+// components/AboutUsModal.tsx
 import { useState } from 'react'
 import { View, Text, Pressable, Modal } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'

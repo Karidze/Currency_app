@@ -1,3 +1,4 @@
+// app/settings/theme.tsx
 import { View, Text, ScrollView, Pressable, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import PageContainer from '../../components/PageContainer'
 import { Ionicons } from '@expo/vector-icons'

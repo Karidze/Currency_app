@@ -1,3 +1,4 @@
+// app/settings/contact.tsx
 import { useEffect, useState } from 'react'
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native'
 import PageContainer from '../../components/PageContainer'

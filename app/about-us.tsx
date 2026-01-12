@@ -1,3 +1,4 @@
+// app/about-us.tsx
 import { View, Text, Pressable, ScrollView } from 'react-native'
 import PageContainer from '../components/PageContainer'
 import { Ionicons } from '@expo/vector-icons'

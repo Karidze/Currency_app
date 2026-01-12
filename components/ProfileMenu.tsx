@@ -1,3 +1,4 @@
+// components/ProfileMenu.tsx
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
