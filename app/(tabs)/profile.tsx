@@ -1,3 +1,5 @@
+//app/(tabs)/profile.tsx
+
 import { useEffect, useState } from "react";
 import AuthForm from "../../components/Auth/AuthForm";
 import ProfileMenu from "../../components/ProfileMenu";

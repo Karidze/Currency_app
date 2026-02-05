@@ -12,7 +12,8 @@ import Text from "./Text";
 type Variant = "primary" | "outline" | "ghost";
 
 type Props = {
-  title: string;
+  title?: string; // Сделаем title необязательным
+  children?: React.ReactNode; // Добавляем поддержку детей
   onPress?: () => void;
   variant?: Variant;
   disabled?: boolean;
@@ -23,6 +24,7 @@ type Props = {
 
 export default function Button({
   title,
+  children, // Достаем children
   onPress,
   variant = "primary",
   disabled,
@@ -66,14 +68,19 @@ export default function Button({
       disabled={isDisabled}
       style={[base, variantStyle, styles.pressable, style]}
     >
-      {loading ? <ActivityIndicator /> : null}
-      <Text
-        weight="600"
-        color={variant === "primary" ? "text" : "primary"}
-        style={{ color: textColor }}
-      >
-        {title}
-      </Text>
+      {loading ? <ActivityIndicator color={textColor} /> : null}
+      
+      {/* Рендерим либо title, либо children */}
+      {title ? (
+        <Text
+          weight="600"
+          style={{ color: textColor }}
+        >
+          {title}
+        </Text>
+      ) : null}
+      
+      {children} 
     </Pressable>
   );
 }

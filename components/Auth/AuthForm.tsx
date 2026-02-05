@@ -1,3 +1,5 @@
+//app/components/AuthForm.tsx
+
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { supabase } from "../../lib/supabase";
