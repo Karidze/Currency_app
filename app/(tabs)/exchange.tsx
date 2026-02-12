@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Alert, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Alert, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedback } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { getTopRates } from "../../lib/nbpApi";
-import { Screen, Text, Card, Icon, Button, Input } from "../../components/ui"; 
+import { Screen, Text, Card, Icon, Button, Input } from "../../components/ui";
 import { useTheme } from "../../hooks/useTheme";
-import { createStyles } from "./exchange.styles";
+import { createStyles } from "../../styles/exchange.styles";
+import { useCallback } from "react";
+import { useFocusEffect } from "expo-router"; 
 
 export default function ExchangeScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
@@ -21,59 +24,49 @@ export default function ExchangeScreen() {
   const [amount, setAmount] = useState("");
   const [result, setResult] = useState("0.00");
 
+  // Состояние модалки
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [activeSetter, setActiveSetter] = useState<((acc: any) => void) | null>(null);
+
   useEffect(() => {
     fetchData();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchData(); // Вызываем загрузку данных каждый раз, когда экран в фокусе
+    }, [])
+  );
+
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-      const { data: wallets } = await supabase.from("wallets").select("*").eq("user_id", user.id);
+      const userId = session.user.id;
+      const { data: profile } = await supabase.from("profiles").select("balance").eq("user_id", userId).single();
+      const { data: wallets } = await supabase.from("wallets").select("*").eq("user_id", userId);
       
       const allAccounts = [
         { id: 'main', currency_code: 'PLN', balance: profile?.balance || 0, is_main: true },
-        ...(wallets || [])
+        ...(wallets || []).map(w => ({ ...w, is_main: false }))
       ];
       
       setAccounts(allAccounts);
-      
-      // Инициализация при первой загрузке
-      if (!fromAccount) setFromAccount(allAccounts[0]); 
-      if (!toAccount && allAccounts.length > 1) setToAccount(allAccounts[1]);
-      
       const marketRates = await getTopRates();
       setRates(marketRates);
+
+      if (params.to) {
+        const foundFrom = allAccounts.find(a => a.currency_code === 'PLN');
+        const foundTo = allAccounts.find(a => a.currency_code === params.to);
+        setFromAccount(foundFrom || allAccounts[0]);
+        setToAccount(foundTo || (allAccounts.length > 1 ? allAccounts[1] : null));
+      } else {
+        setFromAccount(allAccounts[0]);
+        if (allAccounts.length > 1) setToAccount(allAccounts[1]);
+      }
     } catch (e) {
       console.error(e);
-    }
-  };
-
-  // Функция для точечного обновления балансов после обмена
-  const refreshBalances = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-    const { data: wallets } = await supabase.from("wallets").select("*").eq("user_id", user.id);
-    
-    const allAccounts = [
-      { id: 'main', currency_code: 'PLN', balance: profile?.balance || 0, is_main: true },
-      ...(wallets || [])
-    ];
-    
-    setAccounts(allAccounts);
-
-    // Обновляем текущие выбранные аккаунты новыми данными из базы
-    if (fromAccount) {
-      const updatedFrom = allAccounts.find(a => a.currency_code === fromAccount.currency_code);
-      if (updatedFrom) setFromAccount(updatedFrom);
-    }
-    if (toAccount) {
-      const updatedTo = allAccounts.find(a => a.currency_code === toAccount.currency_code);
-      if (updatedTo) setToAccount(updatedTo);
     }
   };
 
@@ -88,32 +81,25 @@ export default function ExchangeScreen() {
     const fromRate = fromAccount.currency_code === 'PLN' ? 1 : rates.find(r => r.code === fromAccount.currency_code)?.mid || 1;
     const toRate = toAccount.currency_code === 'PLN' ? 1 : rates.find(r => r.code === toAccount.currency_code)?.mid || 1;
 
-    const converted = (val * fromRate) / toRate;
-    setResult(converted.toFixed(2));
+    setResult(((val * fromRate) / toRate).toFixed(2));
   }, [amount, fromAccount, toAccount, rates]);
 
-  const selectAccount = (setter: (acc: any) => void) => {
-    Alert.alert(
-      "Select Account",
-      "Available funds:",
-      accounts.map(acc => ({
-        text: `${acc.currency_code} (${acc.balance.toFixed(2)})`,
-        onPress: () => setter(acc)
-      })).concat([{ text: "Cancel", style: "cancel" }] as any)
-    );
+  const openAccountSelector = (setter: (acc: any) => void) => {
+    setActiveSetter(() => setter);
+    setModalVisible(true);
+  };
+
+  const handleSelectAccount = (acc: any) => {
+    if (activeSetter) activeSetter(acc);
+    setModalVisible(false);
+    setActiveSetter(null);
   };
 
   const handleExchange = async () => {
     const numAmount = parseFloat(amount.replace(',', '.'));
     const numResult = parseFloat(result);
 
-    if (!fromAccount || !toAccount || isNaN(numAmount)) return;
-    
-    if (fromAccount.currency_code === toAccount.currency_code) {
-      Alert.alert("Error", "Select different currencies");
-      return;
-    }
-
+    if (isNaN(numAmount) || numAmount <= 0) return;
     if (numAmount > fromAccount.balance) {
       Alert.alert("Error", "Insufficient funds");
       return;
@@ -122,23 +108,20 @@ export default function ExchangeScreen() {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not found");
+      if (!user) throw new Error();
 
-      // 1. Списание
       if (fromAccount.is_main) {
         await supabase.from("profiles").update({ balance: fromAccount.balance - numAmount }).eq("user_id", user.id);
       } else {
         await supabase.from("wallets").update({ balance: fromAccount.balance - numAmount }).eq("id", fromAccount.id);
       }
 
-      // 2. Зачисление
       if (toAccount.is_main) {
         await supabase.from("profiles").update({ balance: toAccount.balance + numResult }).eq("user_id", user.id);
       } else {
         await supabase.from("wallets").update({ balance: toAccount.balance + numResult }).eq("id", toAccount.id);
       }
 
-      // --- ШАГ 2: ЗАПИСЬ В ИСТОРИЮ ТРАНЗАКЦИЙ ---
       await supabase.from("transactions").insert({
         user_id: user.id,
         from_currency: fromAccount.currency_code,
@@ -147,20 +130,13 @@ export default function ExchangeScreen() {
         to_amount: numResult,
         rate: numResult / numAmount
       });
-      // ------------------------------------------
 
-      Alert.alert("Success", "Currency exchanged successfully!", [
-        { 
-          text: "OK", 
-          onPress: () => {
-            setAmount(""); // Чистим ввод
-            refreshBalances(); // Обновляем балансы на экране
-          } 
-        }
-      ]);
+      Alert.alert("Success", "Exchange completed!", [{ text: "OK", onPress: () => {
+        setAmount("");
+        fetchData();
+      }}]);
     } catch (e) {
-      console.error(e);
-      Alert.alert("Error", "Transaction failed. Please try again.");
+      Alert.alert("Error", "Transaction failed");
     } finally {
       setLoading(false);
     }
@@ -168,12 +144,56 @@ export default function ExchangeScreen() {
 
   return (
     <Screen padded>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* МОДАЛКА ВЫБОРА АККАУНТА */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={{ flex: 1 }} />
+          </TouchableWithoutFeedback>
+
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text variant="subtitle" weight="700">Select Account</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} hitSlop={15}>
+                <Icon name="times" size={20} color="muted" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView showsVerticalScrollIndicator={true} style={{ flexGrow: 0 }}>
+              {accounts.map((acc) => (
+                <TouchableOpacity 
+                  key={acc.id} 
+                  style={styles.accountOption}
+                  onPress={() => handleSelectAccount(acc)}
+                >
+                  <View style={styles.accountOptionInfo}>
+                    <Text weight="700" style={{ fontSize: 16 }}>{acc.currency_code}</Text>
+                    <Text variant="caption" color="muted">
+                      Balance: {acc.balance.toFixed(2)}
+                    </Text>
+                  </View>
+                  {(fromAccount?.id === acc.id || toAccount?.id === acc.id) && (
+                    <Icon name="check" size={16} color="primary" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
         <Text variant="title" weight="700" style={{ marginBottom: 20 }}>Exchange</Text>
 
-        {/* FROM SECTION */}
         <Card padding="md" style={styles.card}>
-          <Text variant="caption" color="muted" weight="600" style={{ marginBottom: 8 }}>FROM</Text>
+          <Text variant="caption" color="muted" weight="600">SEND FROM</Text>
           <View style={styles.row}>
             <Input
               placeholder="0.00"
@@ -181,69 +201,57 @@ export default function ExchangeScreen() {
               value={amount}
               onChangeText={setAmount}
               containerStyle={{ flex: 1 }}
-              style={{ borderWidth: 0, fontSize: 24, fontWeight: '700' }}
+              style={styles.input}
             />
-            <Button 
-              title={fromAccount?.currency_code || "PLN"}
-              variant="outline"
-              onPress={() => selectAccount(setFromAccount)}
-              style={{ height: 40, paddingHorizontal: 12 }}
-            />
+            <Button variant="outline" onPress={() => openAccountSelector(setFromAccount)} style={styles.selectorButton}>
+              <Text weight="700" color="primary">{fromAccount?.currency_code || "PLN"}</Text>
+              <Icon name="chevron-down" size={12} color="primary" />
+            </Button>
           </View>
-          <Text variant="caption" color="muted" style={{ marginTop: 8 }}>
+          <Text variant="caption" color="muted" style={styles.balanceText}>
             Balance: {fromAccount?.balance?.toFixed(2)} {fromAccount?.currency_code}
           </Text>
         </Card>
 
-        {/* SWAP ICON */}
-        <View style={{ alignItems: 'center', marginVertical: -15, zIndex: 10 }}>
-          <Button
-            variant="primary"
+        <View style={styles.swapContainer}>
+          <TouchableOpacity 
+            activeOpacity={0.8}
             onPress={() => {
               const temp = fromAccount;
               setFromAccount(toAccount);
               setToAccount(temp);
             }}
-            style={{ width: 44, height: 44, borderRadius: 22, paddingHorizontal: 0 }}
+            style={styles.swapButton}
           >
-            <Icon name="exchange" size={16} color="primary" />
-          </Button>
+            {/* Здесь меняем name на "exchange", если это нужная иконка, 
+                или на ту, которую ты используешь в табах (например "repeat" или "swap") */}
+            <Icon name="exchange" size={20} color="white" style={{ transform: [{ rotate: '90deg' }] }} /> 
+          </TouchableOpacity>
         </View>
 
-        {/* TO SECTION */}
         <Card padding="md" style={styles.card}>
-          <Text variant="caption" color="muted" weight="600" style={{ marginBottom: 8 }}>TO</Text>
+          <Text variant="caption" color="muted" weight="600">RECEIVE TO</Text>
           <View style={styles.row}>
-            <Text style={[styles.input, { flex: 1, paddingLeft: 14 }]}>{result}</Text>
-            <Button 
-              title={toAccount?.currency_code || "Select"}
-              variant="outline"
-              onPress={() => selectAccount(setToAccount)}
-              style={{ height: 40, paddingHorizontal: 12 }}
-            />
+            <View style={styles.resultContainer}>
+              <Text style={styles.resultText}>{result}</Text>
+            </View>
+            <Button variant="outline" onPress={() => openAccountSelector(setToAccount)} style={styles.selectorButton}>
+              <Text weight="700" color="primary">{toAccount?.currency_code || "Select"}</Text>
+              <Icon name="chevron-down" size={12} color="primary" />
+            </Button>
           </View>
-          <Text variant="caption" color="muted" style={{ marginTop: 8 }}>
+          <Text variant="caption" color="muted" style={styles.balanceText}>
             Balance: {toAccount?.balance?.toFixed(2)} {toAccount?.currency_code}
           </Text>
         </Card>
 
-        {/* INFO BOX */}
-        <Card padding="md" style={{ backgroundColor: theme.colors.inputBg, borderStyle: 'dashed' }}>
-          <View style={styles.row}>
-            <Text variant="caption" color="muted">Exchange Rate</Text>
-            <Text variant="caption" weight="700">
-               1 {fromAccount?.currency_code} ≈ {((parseFloat(result) || 0) / (parseFloat(amount) || 1)).toFixed(4)} {toAccount?.currency_code}
-            </Text>
-          </View>
-        </Card>
-
         <Button 
-          title="Confirm Exchange"
+          title="Confirm Transaction" 
           onPress={handleExchange}
           loading={loading}
-          disabled={!amount || parseFloat(amount) <= 0}
-          fullWidth
-          style={{ marginTop: 30 }}
+          disabled={!amount || parseFloat(amount) <= 0 || fromAccount?.id === toAccount?.id}
+          fullWidth 
+          style={{ marginTop: 30 }} 
         />
       </ScrollView>
     </Screen>

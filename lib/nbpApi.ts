@@ -1,3 +1,4 @@
+//lib/nbpApi.ts
 export async function getTopRates() {
   try {
     const url = `http://api.nbp.pl/api/exchangerates/tables/A?format=json`;

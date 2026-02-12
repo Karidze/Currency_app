@@ -1,13 +1,17 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { ScrollView, View, TouchableOpacity, RefreshControl, Alert } from "react-native";
+import { useEffect, useState, useCallback} from "react";
+import { 
+  ScrollView, View, TouchableOpacity, RefreshControl, 
+  Alert, Modal, TouchableWithoutFeedback 
+} from "react-native";
 import * as Clipboard from 'expo-clipboard';
 import { getTopRates } from "../../lib/nbpApi";
 import { supabase } from "../../lib/supabase";
 import { Card, Icon, Screen, Text, Button } from "../../components/ui";
 import { useTheme } from "../../hooks/useTheme";
-import { createStyles } from "./home.styles";
+import { createStyles } from "../../styles/home.styles";
 import { generateAccountNumber } from "../../lib/utils";
+import { useFocusEffect } from "expo-router"; 
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: "$", EUR: "€", GBP: "£", PLN: "zł ", UAH: "₴", TRY: "₺", CHF: "Fr",
@@ -20,19 +24,29 @@ export default function HomeScreen() {
   const [rates, setRates] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [activeWallet, setActiveWallet] = useState<any>(null);
+  
+  // Состояние для модалки
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const router = useRouter();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      
+      // Это сработает каждый раз, когда юзер нажимает на вкладку "Home"
+      // или возвращается сюда после логина
+      return () => {
+        // Тут можно что-то почистить при уходе с экрана, если нужно
+      };
+    }, [])
+  );
 
   const fetchData = async () => {
     setRefreshing(true);
     try {
-      // Проверяем текущего пользователя
       const { data: { user: authUser } } = await supabase.auth.getUser();
       setUser(authUser);
 
@@ -70,38 +84,22 @@ export default function HomeScreen() {
     Alert.alert("Copied!", "Account number copied to clipboard.");
   };
 
-  const handleOpenWallet = async () => {
-    if (!user) {
-      router.push("/profile")
-      return;
-    }
-
-    const existingCodes = wallets.map(w => w.currency_code);
-    const availableToOpen = rates.filter(r => !existingCodes.includes(r.code) && r.code !== 'PLN');
-
-    if (availableToOpen.length === 0) {
-      Alert.alert("Info", "All available currency accounts are already open.");
-      return;
-    }
-
-    Alert.alert(
-      "Open New Wallet",
-      "Select currency:",
-      availableToOpen.map(rate => ({
-        text: `${rate.code} - ${rate.currency}`,
-        onPress: async () => {
-          const { error } = await supabase.from("wallets").insert({
-            user_id: user.id, 
-            currency_code: rate.code, 
-            balance: 0, 
-            account_number: generateAccountNumber()
-          });
-          if (error) Alert.alert("Error", "Could not open wallet");
-          else fetchData();
-        }
-      })).concat([{ text: "Cancel", style: "cancel" }] as any)
-    );
+  // Функция открытия кошелька
+  const createWallet = async (currencyCode: string) => {
+    setModalVisible(false);
+    const { error } = await supabase.from("wallets").insert({
+      user_id: user.id, 
+      currency_code: currencyCode, 
+      balance: 0, 
+      account_number: generateAccountNumber()
+    });
+    
+    if (error) Alert.alert("Error", "Could not open wallet");
+    else fetchData();
   };
+
+  const existingCodes = wallets.map(w => w.currency_code);
+  const availableToOpen = rates.filter(r => !existingCodes.includes(r.code) && r.code !== 'PLN');
 
   const displayCurrency = activeWallet ? activeWallet.currency_code : "PLN";
   const displayBalance = activeWallet ? activeWallet.balance : profile?.balance;
@@ -109,12 +107,61 @@ export default function HomeScreen() {
 
   return (
     <Screen padded={false}>
+      {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ВАЛЮТЫ */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          {/* 1. Нажимаемая область сверху для закрытия */}
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={{ flex: 1 }} />
+          </TouchableWithoutFeedback>
+
+          {/* 2. Контентная часть */}
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text variant="subtitle" weight="700">Select Currency</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Icon name="times" size={20} color="text" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* ScrollView должен быть внутри обычного View, а не под TouchableWithoutFeedback напрямую */}
+            <ScrollView 
+              showsVerticalScrollIndicator={true} 
+              style={{ flexGrow: 0 }} // Важно, чтобы скролл не пытался занять бесконечность
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
+              {availableToOpen.length > 0 ? (
+                availableToOpen.map((rate) => (
+                  <TouchableOpacity 
+                    key={rate.code} 
+                    style={styles.currencyOption}
+                    onPress={() => createWallet(rate.code)}
+                  >
+                    <Text style={[styles.currencyCode, { color: theme.colors.primary }]}>{rate.code}</Text>
+                    <Text style={{ flex: 1 }}>{rate.currency}</Text>
+                    <Icon name="plus" size={14} color="muted" />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text center color="muted" style={{ padding: 20 }}>No more currencies available</Text>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchData} tintColor={theme.colors.primary} />}
       >
         {user ? (
-          // --- КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ ---
           <>
             <View style={styles.header}>
               <TouchableOpacity activeOpacity={0.9} onPress={() => setActiveWallet(null)}>
@@ -128,7 +175,7 @@ export default function HomeScreen() {
                         {CURRENCY_SYMBOLS[displayCurrency] || ""}{Number(displayBalance || 0).toFixed(2)}
                       </Text>
                     </View>
-                    <Icon name={activeWallet ? "credit-card" : "shield"} size={28} color="primary" />
+                    <Icon name={activeWallet ? "credit-card" : "shield"} size={28} color="text" />
                   </View>
 
                   <TouchableOpacity 
@@ -141,7 +188,7 @@ export default function HomeScreen() {
                         {displayAccount || "Generating..."}
                       </Text>
                     </View>
-                    <Icon name="copy" size={16} color="primary" />
+                    <Icon name="copy" size={16} color="text" />
                   </TouchableOpacity>
                 </Card>
               </TouchableOpacity>
@@ -149,7 +196,7 @@ export default function HomeScreen() {
 
             <View style={styles.actionGrid}>
               <QuickAction title="Exchange" icon="exchange" onPress={() => router.push("/exchange")} />
-              <QuickAction title="New Wallet" icon="plus-circle" onPress={handleOpenWallet} />
+              <QuickAction title="New Wallet" icon="plus-circle" onPress={() => setModalVisible(true)} />
               <QuickAction title="History" icon="history" onPress={() => router.push("/history")} />
             </View>
 
