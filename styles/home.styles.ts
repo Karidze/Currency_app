@@ -23,7 +23,8 @@ export const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'space-between', 
     alignItems: 'center', 
     padding: 16, 
-    borderBottomWidth: 1 
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
   rateInfo: { gap: 4 },
   
@@ -32,6 +33,9 @@ export const createStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+  },
+  modalOverlayTouch: {
+    flex: 1,
   },
   modalContent: {
     backgroundColor: theme.colors.background,
@@ -57,5 +61,8 @@ export const createStyles = (theme: any) => StyleSheet.create({
     width: 60,
     fontWeight: '700',
     fontSize: 16,
-  }
+  },
+  topUpHint: { marginBottom: theme.spacing.sm },
+  topUpInputWrap: { marginBottom: theme.spacing.md },
+  topUpButton: { marginTop: theme.spacing.sm },
 });

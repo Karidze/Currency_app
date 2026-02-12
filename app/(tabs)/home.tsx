@@ -2,12 +2,12 @@ import { useRouter } from "expo-router";
 import { useEffect, useState, useCallback} from "react";
 import { 
   ScrollView, View, TouchableOpacity, RefreshControl, 
-  Alert, Modal, TouchableWithoutFeedback 
+  Alert, Modal, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard 
 } from "react-native";
 import * as Clipboard from 'expo-clipboard';
 import { getTopRates } from "../../lib/nbpApi";
 import { supabase } from "../../lib/supabase";
-import { Card, Icon, Screen, Text, Button } from "../../components/ui";
+import { Card, Icon, Screen, Text, Button, Input } from "../../components/ui";
 import { useTheme } from "../../hooks/useTheme";
 import { createStyles } from "../../styles/home.styles";
 import { generateAccountNumber } from "../../lib/utils";
@@ -25,24 +25,15 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeWallet, setActiveWallet] = useState<any>(null);
   
-  // Состояние для модалки
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isTopUpModalVisible, setTopUpModalVisible] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState("");
 
   const router = useRouter();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-      
-      // Это сработает каждый раз, когда юзер нажимает на вкладку "Home"
-      // или возвращается сюда после логина
-      return () => {
-        // Тут можно что-то почистить при уходе с экрана, если нужно
-      };
-    }, [])
-  );
+  useFocusEffect(useCallback(() => { fetchData(); }, []));
 
   const fetchData = async () => {
     setRefreshing(true);
@@ -84,7 +75,6 @@ export default function HomeScreen() {
     Alert.alert("Copied!", "Account number copied to clipboard.");
   };
 
-  // Функция открытия кошелька
   const createWallet = async (currencyCode: string) => {
     setModalVisible(false);
     const { error } = await supabase.from("wallets").insert({
@@ -102,39 +92,105 @@ export default function HomeScreen() {
   const availableToOpen = rates.filter(r => !existingCodes.includes(r.code) && r.code !== 'PLN');
 
   const displayCurrency = activeWallet ? activeWallet.currency_code : "PLN";
+  const displayAccountId = activeWallet ? activeWallet.id : null;
+  const isMainAccount = !activeWallet;
+
+  const closeTopUp = () => {
+    Keyboard.dismiss();
+    setTopUpModalVisible(false);
+    setTopUpAmount("");
+  };
+
+  const handleTopUp = async () => {
+    const amount = parseFloat(topUpAmount.replace(",", "."));
+    if (isNaN(amount) || amount <= 0) {
+      Alert.alert("Error", "Enter a valid amount");
+      return;
+    }
+    if (!user) return;
+    try {
+      if (isMainAccount) {
+        const newBalance = (profile?.balance ?? 0) + amount;
+        const { error } = await supabase.from("profiles").update({ balance: newBalance }).eq("user_id", user.id);
+        if (error) throw error;
+      } else if (displayAccountId) {
+        const newBalance = (activeWallet?.balance ?? 0) + amount;
+        const { error } = await supabase.from("wallets").update({ balance: newBalance }).eq("id", displayAccountId).eq("user_id", user.id);
+        if (error) throw error;
+      }
+      closeTopUp();
+      fetchData();
+      Alert.alert("Done", `+${amount.toFixed(2)} ${displayCurrency} added.`);
+    } catch (e) {
+      Alert.alert("Error", "Top-up failed");
+    }
+  };
   const displayBalance = activeWallet ? activeWallet.balance : profile?.balance;
   const displayAccount = activeWallet ? activeWallet.account_number : profile?.account_number;
 
   return (
     <Screen padded={false}>
-      {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ВАЛЮТЫ */}
       <Modal
-        visible={isModalVisible}
-        transparent={true}
+        visible={isTopUpModalVisible}
+        transparent
         animationType="slide"
         presentationStyle="overFullScreen"
-        statusBarTranslucent={true}
+        statusBarTranslucent
+        onRequestClose={closeTopUp}
+      >
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
+        >
+          <TouchableWithoutFeedback onPress={closeTopUp}>
+            <View style={styles.modalOverlayTouch} />
+          </TouchableWithoutFeedback>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text variant="subtitle" weight="700">Top up</Text>
+              <TouchableOpacity onPress={closeTopUp} hitSlop={15}>
+                <Icon name="times" size={20} color="muted" />
+              </TouchableOpacity>
+            </View>
+            <Text variant="caption" color="muted" style={styles.topUpHint}>
+              {displayCurrency === "PLN" ? "Main account" : `${displayCurrency} wallet`} · Balance: {(Number(displayBalance) || 0).toFixed(2)} {displayCurrency}
+            </Text>
+            <View style={styles.topUpInputWrap}>
+              <Input
+                placeholder="0.00"
+                value={topUpAmount}
+                onChangeText={setTopUpAmount}
+                keyboardType="decimal-pad"
+              />
+            </View>
+            <Button title="Add funds" onPress={handleTopUp} style={styles.topUpButton} />
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="slide"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          {/* 1. Нажимаемая область сверху для закрытия */}
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
-
-          {/* 2. Контентная часть */}
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text variant="subtitle" weight="700">Select Currency</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Icon name="times" size={20} color="text" />
+              <Text variant="subtitle" weight="700">New wallet</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} hitSlop={15}>
+                <Icon name="times" size={20} color="muted" />
               </TouchableOpacity>
             </View>
-            
-            {/* ScrollView должен быть внутри обычного View, а не под TouchableWithoutFeedback напрямую */}
-            <ScrollView 
-              showsVerticalScrollIndicator={true} 
-              style={{ flexGrow: 0 }} // Важно, чтобы скролл не пытался занять бесконечность
+            <ScrollView
+              showsVerticalScrollIndicator
+              style={{ flexGrow: 0 }}
               contentContainerStyle={{ paddingBottom: 20 }}
             >
               {availableToOpen.length > 0 ? (
@@ -196,7 +252,8 @@ export default function HomeScreen() {
 
             <View style={styles.actionGrid}>
               <QuickAction title="Exchange" icon="exchange" onPress={() => router.push("/exchange")} />
-              <QuickAction title="New Wallet" icon="plus-circle" onPress={() => setModalVisible(true)} />
+              <QuickAction title="Top up" icon="plus-circle" onPress={() => setTopUpModalVisible(true)} />
+              <QuickAction title="New Wallet" icon="credit-card" onPress={() => setModalVisible(true)} />
               <QuickAction title="History" icon="history" onPress={() => router.push("/history")} />
             </View>
 
@@ -225,7 +282,6 @@ export default function HomeScreen() {
             </View>
           </>
         ) : (
-          // --- КОНТЕНТ ДЛЯ ГОСТЯ ---
           <View style={{ padding: 20, paddingTop: 40 }}>
             <Card padding="lg" style={{ alignItems: 'center', borderStyle: 'dashed' }}>
               <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: theme.colors.inputBg, justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
@@ -244,7 +300,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* --- ОБЩИЙ КОНТЕНТ (КУРСЫ) --- */}
         <View style={styles.section}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 20 }}>
             <Text variant="subtitle" weight="700" style={styles.sectionTitle}>Market Rates</Text>
@@ -252,7 +307,7 @@ export default function HomeScreen() {
           </View>
           <Card padding="none" style={{ marginHorizontal: 20, marginBottom: 20 }}>
             {rates.map((item, index) => (
-              <View key={item.code} style={[styles.rateRow, index === rates.length - 1 ? { borderBottomWidth: 0 } : { borderBottomColor: theme.colors.border }]}>
+              <View key={item.code} style={[styles.rateRow, index === rates.length - 1 && { borderBottomWidth: 0 }]}>
                 <View style={styles.rateInfo}>
                   <Text weight="600">{item.code}</Text>
                   <Text variant="caption" color="muted">{item.currency}</Text>
