@@ -1,50 +1,65 @@
-# Welcome to your Expo app 👋
+# Currency Exchange App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile app for a currency exchange office – view rates from NBP API, virtual wallet, currency exchange, and transaction history.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Registration and login** (Supabase Auth)
+- **Home screen** – PLN balance and currency accounts, top-up, rates
+- **Rates** – current and archival rates (date picker), search, favorites
+- **Exchange** – choose From/To accounts, amount, NBP rate, save transaction
+- **Transactions (History)** – list of your transactions
+- **Profile** – user data, edit profile, settings, change password
+
+## Tech stack
+
+- **Expo** (React Native), **TypeScript**
+- **Supabase** – Auth, database (PostgreSQL): `profiles`, `wallets`, `transactions`
+- **NBP API** – currency rates (table A), current and archival
+
+The app connects directly to Supabase and NBP API (no separate Web Service).
+
+## Getting started
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Configure Supabase: in `lib/supabase.ts` set `supabaseUrl` and `supabaseKey` (or use environment variables).
+
+3. Start the app:
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+   Then: scan QR in Expo Go, or run on Android emulator / iOS simulator.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Scripts
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+| Command | Description |
+|--------|-------------|
+| `npm start` | Start Expo |
+| `npx expo start --android` | Android |
+| `npx expo start --ios` | iOS |
+| `npm run lint` | ESLint |
 
-## Get a fresh project
+## Project structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/(tabs)/     – screens: home, rates, exchange, history, profile
+lib/            – supabase.ts, nbpApi.ts, utils.ts
+components/     – AuthForm, ProfileMenu, UI, AboutUsModal, AvatarWithCamera
+constants/      – theme
+hooks/          – useTheme, useAvatar
+styles/         – styles for screens
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Sources
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [NBP API](https://api.nbp.pl/)
+- [Supabase](https://supabase.com/docs)
+- [Expo](https://docs.expo.dev/)
+- [React Native](https://reactnative.dev/)
