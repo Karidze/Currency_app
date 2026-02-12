@@ -62,4 +62,33 @@ export const createStyles = (theme: Theme) =>
       marginTop: 50,
       alignItems: "center",
     },
+    archiveRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 12,
+      paddingHorizontal: 4,
+    },
+    archiveLabel: { flex: 1 },
+    dateButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      backgroundColor: theme.colors.inputBg,
+      borderRadius: theme.radius.md,
+    },
+    todayButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    archiveEmpty: {
+      marginTop: 24,
+      alignItems: "center",
+      paddingVertical: 20,
+    },
   });
