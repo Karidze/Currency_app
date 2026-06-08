@@ -1,5 +1,4 @@
-// context/ThemeContext.tsx
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
 import type { Theme, ThemeMode } from "../constants/theme";
 import { darkTheme, lightTheme } from "../constants/theme";
 
@@ -11,34 +10,43 @@ type ThemeContextValue = {
   toggle: () => void;
 };
 
-// ВАЖЛИВО: export (щоб useTheme міг імпортувати)
-export const ThemeContext = createContext<ThemeContextValue | null>(null);
+const defaultContextValue: ThemeContextValue = {
+  mode: "light",
+  isDark: false,
+  theme: lightTheme,
+  setMode: () => {},
+  toggle: () => {},
+};
+
+export const ThemeContext = createContext<ThemeContextValue>(defaultContextValue);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>("light");
 
+  const toggle = useCallback(() => {
+    setMode((m) => (m === "dark" ? "light" : "dark"));
+  }, []);
+
   const value = useMemo<ThemeContextValue>(() => {
     const isDark = mode === "dark";
-    const theme = isDark ? darkTheme : lightTheme;
-
     return {
       mode,
       isDark,
-      theme,
+      theme: isDark ? darkTheme : lightTheme,
       setMode,
-      toggle: () => setMode((m) => (m === "dark" ? "light" : "dark")),
+      toggle,
     };
-  }, [mode]);
+  }, [mode, toggle]);
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 
-// optional (можеш не юзати, якщо є useTheme.ts)
 export function useThemeContext() {
   const ctx = useContext(ThemeContext);
-  if (!ctx)
+  if (!ctx) {
     throw new Error("useThemeContext must be used inside ThemeProvider");
+  }
   return ctx;
 }
