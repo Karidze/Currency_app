@@ -34,30 +34,41 @@ export default function HistoryScreen() {
     fetchHistory();
   }, []);
 
-  const renderItem = ({ item }: { item: any }) => (
-    <Card padding="md" style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center' }}>
-      <View style={{ 
-        width: 40, height: 40, borderRadius: 20, 
-        backgroundColor: theme.colors.primary + '20', 
-        justifyContent: 'center', alignItems: 'center', marginRight: 12 
-      }}>
-        <Icon name="exchange" size={18} color="primary" />
-      </View>
-      
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text weight="700">{item.from_currency} → {item.to_currency}</Text>
-          <Text weight="700" color="primary">+{item.to_amount.toFixed(2)} {item.to_currency}</Text>
+  const renderItem = ({ item }: { item: any }) => {
+    const isDeposit = item.from_currency === item.to_currency && item.from_amount === 0;
+    const successColor = theme.colors.success || "#4CD964";
+
+    return (
+      <Card padding="md" style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ 
+          width: 40, height: 40, borderRadius: 20, 
+          backgroundColor: isDeposit ? successColor + '20' : theme.colors.primary + '20', 
+          justifyContent: 'center', alignItems: 'center', marginRight: 12 
+        }}>
+          <Icon name={isDeposit ? "plus" : "exchange"} size={18} color={isDeposit ? "success" : "primary"} />
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
-          <Text variant="caption" color="muted">
-            {new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-          <Text variant="caption" color="muted">-{item.from_amount.toFixed(2)} {item.from_currency}</Text>
+        
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text weight="700">
+              {isDeposit ? `Top up ${item.to_currency}` : `${item.from_currency} → ${item.to_currency}`}
+            </Text>
+            <Text weight="700" style={{ color: isDeposit ? successColor : theme.colors.primary }}>
+              +{item.to_amount.toFixed(2)} {item.to_currency}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
+            <Text variant="caption" color="muted">
+              {new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+            {!isDeposit && (
+              <Text variant="caption" color="muted">-{item.from_amount.toFixed(2)} {item.from_currency}</Text>
+            )}
+          </View>
         </View>
-      </View>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   return (
     <Screen padded>

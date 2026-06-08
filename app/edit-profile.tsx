@@ -14,7 +14,6 @@ import { supabase } from "../lib/supabase";
 import { useAvatar } from "../hooks/useAvatar";
 import AvatarWithCamera from "../components/AvatarWithCamera";
 
-// ✅ new UI
 import { Button, Card, Icon, Input, Screen, Text } from "../components/ui";
 import { useTheme } from "../hooks/useTheme";
 
@@ -114,7 +113,7 @@ export default function EditProfileScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
-          {/* Header */}
+
           <View style={styles.headerRow}>
             <Pressable
               onPress={() => router.back()}

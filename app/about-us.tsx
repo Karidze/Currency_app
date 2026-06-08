@@ -3,7 +3,6 @@ import { Stack, useRouter } from "expo-router";
 
 import AboutUsModal from "../components/AboutUsModal";
 
-// ✅ new UI
 import { Card, Icon, Screen, Text } from "../components/ui";
 import { useTheme } from "../hooks/useTheme";
 
@@ -23,7 +22,7 @@ export default function AboutUsScreen() {
           gap: theme.spacing.lg,
         }}
       >
-        {/* Header */}
+        
         <View
           style={{
             flexDirection: "row",

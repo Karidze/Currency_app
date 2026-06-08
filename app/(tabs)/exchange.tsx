@@ -24,7 +24,6 @@ export default function ExchangeScreen() {
   const [amount, setAmount] = useState("");
   const [result, setResult] = useState("0.00");
 
-  // Состояние модалки
   const [isModalVisible, setModalVisible] = useState(false);
   const [activeSetter, setActiveSetter] = useState<((acc: any) => void) | null>(null);
 
@@ -144,7 +143,6 @@ export default function ExchangeScreen() {
 
   return (
     <Screen padded>
-      {/* МОДАЛКА ВЫБОРА АККАУНТА */}
       <Modal
         visible={isModalVisible}
         transparent={true}

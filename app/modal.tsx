@@ -1,7 +1,6 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-// ✅ new UI
 import { Button, Card, Screen, Text } from "../components/ui";
 import { useTheme } from "../hooks/useTheme";
 

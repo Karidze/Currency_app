@@ -118,13 +118,27 @@ export default function HomeScreen() {
         const { error } = await supabase.from("wallets").update({ balance: newBalance }).eq("id", displayAccountId).eq("user_id", user.id);
         if (error) throw error;
       }
+
+      const { error: txError } = await supabase.from("transactions").insert({
+        user_id: user.id,
+        from_currency: displayCurrency, 
+        to_currency: displayCurrency,   
+        from_amount: 0,                
+        to_amount: amount,             
+        rate: 1,                       
+      });
+
+      if (txError) throw txError;
+
       closeTopUp();
       fetchData();
       Alert.alert("Done", `+${amount.toFixed(2)} ${displayCurrency} added.`);
     } catch (e) {
+      console.error(e);
       Alert.alert("Error", "Top-up failed");
     }
   };
+  
   const displayBalance = activeWallet ? activeWallet.balance : profile?.balance;
   const displayAccount = activeWallet ? activeWallet.account_number : profile?.account_number;
 
