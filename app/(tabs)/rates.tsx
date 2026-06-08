@@ -19,7 +19,7 @@ import { getRatesByDate } from "../../lib/nbpApi";
 async function fetchRatesWithTrend() {
   try {
     const res = await fetch(
-      `https://api.nbp.pl/api/exchangerates/tables/A?format=json`
+      `http://api.nbp.pl/api/exchangerates/tables/A?format=json`
     );
     const data = await res.json();
     return (data[0]?.rates ?? []).map((r: any) => ({

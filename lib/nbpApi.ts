@@ -2,7 +2,7 @@
 
 export async function getTopRates() {
   try {
-    const url = `https://api.nbp.pl/api/exchangerates/tables/A?format=json`;
+    const url = `http://api.nbp.pl/api/exchangerates/tables/A?format=json`;
     const response = await fetch(url, {
       method: "GET",
       headers: { Accept: "application/json" },
@@ -22,7 +22,7 @@ export async function getTopRates() {
 
 /** Курси на конкретну дату (YYYY-MM-DD). 404 (вихідні/свята) → []. Мережева помилка → throw. */
 export async function getRatesByDate(dateStr: string): Promise<any[]> {
-  const url = `https://api.nbp.pl/api/exchangerates/tables/A/${dateStr}?format=json`;
+  const url = `http://api.nbp.pl/api/exchangerates/tables/A/${dateStr}?format=json`;
   const response = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },

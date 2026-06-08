@@ -3,7 +3,6 @@ import { supabase } from './supabase';
 import { generateAccountNumber } from './utils';
 
 export const openWallet = async (userId: string, currencyCode: string) => {
-  // ИСПРАВЛЕНО: вызываем без аргументов ()
   const accNum = generateAccountNumber(); 
 
   if (currencyCode === 'PLN') {

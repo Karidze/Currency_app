@@ -34,7 +34,7 @@ export default function ExchangeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchData(); // Вызываем загрузку данных каждый раз, когда экран в фокусе
+      fetchData(); 
     }, [])
   );
 
@@ -223,8 +223,6 @@ export default function ExchangeScreen() {
             }}
             style={styles.swapButton}
           >
-            {/* Здесь меняем name на "exchange", если это нужная иконка, 
-                или на ту, которую ты используешь в табах (например "repeat" или "swap") */}
             <Icon name="exchange" size={20} color="white" style={{ transform: [{ rotate: '90deg' }] }} /> 
           </TouchableOpacity>
         </View>
