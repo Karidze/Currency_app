@@ -55,6 +55,7 @@ components/     – AuthForm, ProfileMenu, UI, AboutUsModal, AvatarWithCamera
 constants/      – theme
 hooks/          – useTheme, useAvatar
 styles/         – styles for screens
+
 ```
 
 ## Sources
