@@ -1,4 +1,5 @@
 // components/ui/Button.tsx
+
 import React from "react";
 import {
   ActivityIndicator,
@@ -12,8 +13,8 @@ import Text from "./Text";
 type Variant = "primary" | "outline" | "ghost";
 
 type Props = {
-  title?: string; // Сделаем title необязательным
-  children?: React.ReactNode; // Добавляем поддержку детей
+  title?: string; 
+  children?: React.ReactNode;
   onPress?: () => void;
   variant?: Variant;
   disabled?: boolean;
@@ -24,7 +25,7 @@ type Props = {
 
 export default function Button({
   title,
-  children, // Достаем children
+  children,
   onPress,
   variant = "primary",
   disabled,
@@ -70,7 +71,6 @@ export default function Button({
     >
       {loading ? <ActivityIndicator color={textColor} /> : null}
       
-      {/* Рендерим либо title, либо children */}
       {title ? (
         <Text
           weight="600"
@@ -87,6 +87,5 @@ export default function Button({
 
 const styles = StyleSheet.create({
   pressable: {
-    // тут можна додати легку тінь потім, якщо захочеш
   },
 });

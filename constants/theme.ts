@@ -1,4 +1,5 @@
 // constants/theme.ts
+
 export type ThemeMode = "light" | "dark";
 
 export type Theme = {
@@ -48,7 +49,7 @@ export type Theme = {
 export const lightTheme: Theme = {
   colors: {
     background: "#FFFFFF",
-    text: "#111111",
+    text: "#141414",
     mutedText: "#6B7280",
 
     card: "#FFFFFF",

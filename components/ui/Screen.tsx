@@ -1,4 +1,5 @@
 // components/ui/Screen.tsx
+
 import React, { ReactNode } from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

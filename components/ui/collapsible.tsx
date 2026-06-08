@@ -1,4 +1,5 @@
 // components/ui/collapsible.tsx
+
 import React, { PropsWithChildren, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";

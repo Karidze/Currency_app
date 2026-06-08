@@ -1,3 +1,5 @@
+
+
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { StyleProp, TextStyle } from "react-native";
@@ -6,7 +8,6 @@ import { useTheme } from "../../hooks/useTheme";
 type Props = {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   size?: number;
-  // Добавляем (string & {}) — это хак для TS, чтобы он предлагал варианты, но разрешал любой текст
   color?: "text" | "muted" | "primary" | "white" | (string & {}); 
   style?: StyleProp<TextStyle>;
 };
@@ -19,7 +20,6 @@ export default function Icon({
 }: Props) {
   const { theme } = useTheme();
 
-  // Логика выбора цвета
   let resolvedColor: string;
 
   switch (color) {
@@ -33,12 +33,12 @@ export default function Icon({
       resolvedColor = theme.colors.mutedText;
       break;
     case "white":
-      resolvedColor = "#FFFFFF"; // Явно задаем белый
+      resolvedColor = "#FFFFFF";
       break;
     default:
-      // Если передали hex (#fff) или название цвета (red), используем его напрямую
       resolvedColor = color; 
   }
 
+  
   return <FontAwesome name={name} size={size} color={resolvedColor} style={style} />;
 }

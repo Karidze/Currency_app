@@ -1,4 +1,6 @@
 // components/ui/Card.tsx
+
+
 import React from "react";
 import { View, ViewProps, StyleSheet } from "react-native";
 import { useTheme } from "../../hooks/useTheme";

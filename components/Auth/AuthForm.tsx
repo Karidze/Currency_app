@@ -102,6 +102,6 @@ export default function AuthForm() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, justifyContent: "center" },
   card: { gap: 12 },
-  sub: { marginBottom: 8 },
+  sub: { marginBottom: 10 },
   form: { gap: 12 },
 });

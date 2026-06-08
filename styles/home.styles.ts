@@ -28,7 +28,6 @@ export const createStyles = (theme: any) => StyleSheet.create({
   },
   rateInfo: { gap: 4 },
   
-  // СТИЛИ ДЛЯ МОДАЛКИ
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -42,7 +41,7 @@ export const createStyles = (theme: any) => StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
-    maxHeight: height * 0.7, // 70% экрана
+    maxHeight: height * 0.7,
   },
   modalHeader: {
     flexDirection: 'row',

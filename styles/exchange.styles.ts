@@ -36,15 +36,14 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     zIndex: 10,
   },
   swapButton: {
-    backgroundColor: theme.colors.primary, // Основной цвет приложения
+    backgroundColor: theme.colors.primary, 
     width: 48,
     height: 48,
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
-    borderColor: theme.colors.background, // Создает визуальный разрыв между карточками
-    // Тени для объема
+    borderColor: theme.colors.background, 
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
